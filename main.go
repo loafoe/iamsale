@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/loafoe/sailpoint/gen/account"
-	"github.com/loafoe/sailpoint/gen/http/account/server"
+	"github.com/loafoe/iamsale/gen/account"
+	"github.com/loafoe/iamsale/gen/http/account/server"
 	goahttp "goa.design/goa/v3/http"
 	"goa.design/goa/v3/security"
 	"net/http"
@@ -30,18 +30,18 @@ func (a acct) Create(ctx context.Context, payload *account.CreatePayload) (res *
 func (a acct) Get(ctx context.Context, payload *account.GetPayload) (res *account.Account, err error) {
 	return &account.Account{
 		ID:    &payload.AccountID,
-		Login: "andy",
-		Email: "andy@loafoe.com",
-		Name:  "Andy Lo",
+		Login: "amos",
+		Email: "amos@hostedzonehere.com",
+		Name:  "Amos Burton",
 	}, nil
 }
 
 func (a acct) Update(ctx context.Context, payload *account.UpdatePayload) (res *account.Account, err error) {
 	return &account.Account{
 		ID:    &payload.AccountID,
-		Login: "andy",
-		Email: "andy@loafoe.com",
-		Name:  "Andy Lo",
+		Login: "amos",
+		Email: "amos@hostedzonehere.com",
+		Name:  "Amos Burton",
 	}, nil
 }
 

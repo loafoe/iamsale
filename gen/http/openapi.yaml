@@ -308,7 +308,7 @@ definitions:
             status:
                 type: string
                 description: Status of account
-                example: active
+                example: disabled
                 enum:
                     - active
                     - disabled
@@ -317,7 +317,7 @@ definitions:
             id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
             login: amos
             name: Amos Burton
-            status: disabled
+            status: active
         required:
             - name
             - login
@@ -434,7 +434,7 @@ definitions:
             status:
                 type: string
                 description: Status of account
-                example: active
+                example: disabled
                 enum:
                     - active
                     - disabled
@@ -443,7 +443,7 @@ definitions:
             id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
             login: amos
             name: Amos Burton
-            status: active
+            status: disabled
         required:
             - name
             - login
@@ -455,7 +455,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: false
+                example: true
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -518,15 +518,15 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: groups_PermissionDenied_response_body result type (default view)
         example:
-            fault: false
+            fault: true
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
-            timeout: false
+            temporary: true
+            timeout: true
         required:
             - name
             - id

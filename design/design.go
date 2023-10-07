@@ -23,11 +23,12 @@ var BasicAuth = BasicAuthSecurity("BasicAuth", func() {
 	Description("Use client ID and client secret to authenticate")
 })
 
-var _ = API("sailpoint", func() {
+var _ = API("iamsale", func() {
 	Title("IAM to broker identity integration")
 	Version("1")
+	Security(BasicAuth)
 	Description("An integration API towards identity brokers.")
-	Server("sailpoint", func() {
+	Server("iamsale", func() {
 		Host("localhost", func() { URI("http://localhost:8088") })
 	})
 })
@@ -88,6 +89,7 @@ var Group = Type("group", func() {
 var _ = Service("test", func() {
 	Description("Test service availability")
 	Method("test", func() {
+		NoSecurity()
 		HTTP(func() {
 			// Requests to the service consist of HTTP GET requests
 			// The payload fields are encoded as path parameters
@@ -110,7 +112,6 @@ var _ = Service("aggregate", func() {
 			Password("password")
 			Required("username", "password")
 		})
-		Security(BasicAuth)
 		Error("PermissionDenied")
 		Result(ArrayOf(Account))
 		HTTP(func() {
@@ -126,7 +127,6 @@ var _ = Service("aggregate", func() {
 			Password("password")
 			Required("username", "password")
 		})
-		Security(BasicAuth)
 		Error("PermissionDenied")
 		Result(ArrayOf(Group))
 		HTTP(func() {
@@ -148,7 +148,6 @@ var _ = Service("account", func() {
 			Field(1, "account", CreateAccount)
 			Required("username", "password", "account")
 		}, CreateAccount)
-		Security(BasicAuth)
 		Result(Account)
 		HTTP(func() {
 			POST("/account")
@@ -167,7 +166,6 @@ var _ = Service("account", func() {
 			})
 			Required("username", "password", "accountId")
 		})
-		Security(BasicAuth)
 		Result(Account)
 		HTTP(func() {
 			GET("/account/{accountId}")
@@ -185,7 +183,6 @@ var _ = Service("account", func() {
 			Field(4, "account", UpdateAccount)
 			Required("username", "password", "accountId", "account")
 		})
-		Security(BasicAuth)
 		Result(Account)
 		HTTP(func() {
 			PUT("/account/{accountId}")
@@ -203,7 +200,6 @@ var _ = Service("account", func() {
 			})
 			Required("username", "password", "accountId")
 		}, Account)
-		Security(BasicAuth)
 		HTTP(func() {
 			DELETE("/account/{accountId}")
 			Response(StatusNoContent)
@@ -223,7 +219,6 @@ var _ = Service("account", func() {
 			})
 			Required("username", "password", "accountId", "groupId")
 		}, Account)
-		Security(BasicAuth)
 		HTTP(func() {
 			POST("/account/{accountId}/group/{groupId}")
 			Response(StatusNoContent)
@@ -243,7 +238,6 @@ var _ = Service("account", func() {
 			})
 			Required("username", "password", "accountId", "groupId")
 		}, Account)
-		Security(BasicAuth)
 		HTTP(func() {
 			DELETE("/account/{accountId}/group/{groupId}")
 			Response(StatusNoContent)
