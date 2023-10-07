@@ -3,7 +3,7 @@
 // HTTP request path constructors for the account service.
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
@@ -16,7 +16,27 @@ func CreateAccountPath() string {
 	return "/account"
 }
 
+// GetAccountPath returns the URL path to the account service get HTTP endpoint.
+func GetAccountPath(accountID string) string {
+	return fmt.Sprintf("/account/%v", accountID)
+}
+
+// UpdateAccountPath returns the URL path to the account service update HTTP endpoint.
+func UpdateAccountPath(accountID string) string {
+	return fmt.Sprintf("/account/%v", accountID)
+}
+
 // DeleteAccountPath returns the URL path to the account service delete HTTP endpoint.
 func DeleteAccountPath(accountID string) string {
 	return fmt.Sprintf("/account/%v", accountID)
+}
+
+// GroupAddAccountPath returns the URL path to the account service groupAdd HTTP endpoint.
+func GroupAddAccountPath(accountID string, groupID string) string {
+	return fmt.Sprintf("/account/%v/group/%v", accountID, groupID)
+}
+
+// GroupRemoveAccountPath returns the URL path to the account service groupRemove HTTP endpoint.
+func GroupRemoveAccountPath(accountID string, groupID string) string {
+	return fmt.Sprintf("/account/%v/group/%v", accountID, groupID)
 }

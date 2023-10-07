@@ -3,7 +3,7 @@
 // account service
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package account
 
@@ -15,10 +15,20 @@ import (
 
 // Accounts APIs
 type Service interface {
-	// Create an account
-	Create(context.Context, *CreatePayload) (err error)
+	// Creates an account. Note that the client may choose to create a shadow
+	// account or hold the account in a temporary store until the actual account
+	// materializes.
+	Create(context.Context, *CreatePayload) (res *Account, err error)
+	// Get account details
+	Get(context.Context, *GetPayload) (res *Account, err error)
+	// Update account details
+	Update(context.Context, *UpdatePayload) (res *Account, err error)
 	// Delete an account
 	Delete(context.Context, *DeletePayload) (err error)
+	// Add an account to a group
+	GroupAdd(context.Context, *GroupAddPayload) (err error)
+	// Remove an account from a group
+	GroupRemove(context.Context, *GroupRemovePayload) (err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -35,24 +45,36 @@ const ServiceName = "account"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"create", "delete"}
+var MethodNames = [6]string{"create", "get", "update", "delete", "groupAdd", "groupRemove"}
 
+// Account is the result type of the account service create method.
 type Account struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
 	// Name of user
-	Name *string
+	Name string
 	// Login of user
-	Login *string
+	Login string
 	// Email of user
-	Email *string
+	Email string `gorm:"index"`
+	// Status of account
+	Status *string
+}
+
+type CreateAccount struct {
+	// Name of user
+	Name string
+	// Login of user
+	Login string
+	// Email of user
+	Email string
 }
 
 // CreatePayload is the payload type of the account service create method.
 type CreatePayload struct {
-	// Username
 	Username string
-	// Password
 	Password string
-	Account  *Account
+	Account  *CreateAccount
 }
 
 // DeletePayload is the payload type of the account service delete method.
@@ -61,4 +83,51 @@ type DeletePayload struct {
 	Password string
 	// Account ID
 	AccountID string
+}
+
+// GetPayload is the payload type of the account service get method.
+type GetPayload struct {
+	// Username
+	Username string
+	// Password
+	Password string
+	// Account ID
+	AccountID string
+}
+
+// GroupAddPayload is the payload type of the account service groupAdd method.
+type GroupAddPayload struct {
+	Username string
+	Password string
+	// Account ID
+	AccountID string
+	// Group ID
+	GroupID string
+}
+
+// GroupRemovePayload is the payload type of the account service groupRemove
+// method.
+type GroupRemovePayload struct {
+	Username string
+	Password string
+	// Account ID
+	AccountID string
+	// Group ID
+	GroupID string
+}
+
+type UpdateAccount struct {
+	// Status of user
+	Status string
+}
+
+// UpdatePayload is the payload type of the account service update method.
+type UpdatePayload struct {
+	// Username
+	Username string
+	// Password
+	Password string
+	// Account ID
+	AccountID string
+	Account   *UpdateAccount
 }

@@ -3,7 +3,7 @@
 // sailpoint HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package cli
 
@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"os"
 
-	accountc "github.com/loafoe/sailpoint/gen/http/account/client"
-	aggregatec "github.com/loafoe/sailpoint/gen/http/aggregate/client"
-	testc "github.com/loafoe/sailpoint/gen/http/test/client"
+	accountc "github.com/loafoe/iamsale/gen/http/account/client"
+	aggregatec "github.com/loafoe/iamsale/gen/http/aggregate/client"
+	testc "github.com/loafoe/iamsale/gen/http/test/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -26,19 +26,19 @@ import (
 func UsageCommands() string {
 	return `test test
 aggregate (accounts|groups)
-account (create|delete)
+account (create|get|update|delete|group-add|group-remove)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` test test` + "\n" +
-		os.Args[0] + ` aggregate accounts --username "Blanditiis dolorum minus." --password "Quia voluptatem quo iste."` + "\n" +
+		os.Args[0] + ` aggregate accounts --username "Facilis aut omnis voluptates minus voluptatem totam." --password "Nulla inventore sunt officia quas non."` + "\n" +
 		os.Args[0] + ` account create --body '{
       "email": "amos@hostedzonehere.com",
       "login": "amos",
       "name": "Amos Burton"
-   }' --username "Consequatur est quas distinctio labore." --password "Quo adipisci iste iste aut cupiditate."` + "\n" +
+   }' --username "Molestiae consequatur dolorem pariatur vitae." --password "Omnis ut tenetur."` + "\n" +
 		""
 }
 
@@ -70,13 +70,36 @@ func ParseEndpoint(
 
 		accountCreateFlags        = flag.NewFlagSet("create", flag.ExitOnError)
 		accountCreateBodyFlag     = accountCreateFlags.String("body", "REQUIRED", "")
-		accountCreateUsernameFlag = accountCreateFlags.String("username", "REQUIRED", "Username")
-		accountCreatePasswordFlag = accountCreateFlags.String("password", "REQUIRED", "Password")
+		accountCreateUsernameFlag = accountCreateFlags.String("username", "REQUIRED", "")
+		accountCreatePasswordFlag = accountCreateFlags.String("password", "REQUIRED", "")
+
+		accountGetFlags         = flag.NewFlagSet("get", flag.ExitOnError)
+		accountGetAccountIDFlag = accountGetFlags.String("account-id", "REQUIRED", "Account ID")
+		accountGetUsernameFlag  = accountGetFlags.String("username", "REQUIRED", "Username")
+		accountGetPasswordFlag  = accountGetFlags.String("password", "REQUIRED", "Password")
+
+		accountUpdateFlags         = flag.NewFlagSet("update", flag.ExitOnError)
+		accountUpdateBodyFlag      = accountUpdateFlags.String("body", "REQUIRED", "")
+		accountUpdateAccountIDFlag = accountUpdateFlags.String("account-id", "REQUIRED", "Account ID")
+		accountUpdateUsernameFlag  = accountUpdateFlags.String("username", "REQUIRED", "Username")
+		accountUpdatePasswordFlag  = accountUpdateFlags.String("password", "REQUIRED", "Password")
 
 		accountDeleteFlags         = flag.NewFlagSet("delete", flag.ExitOnError)
 		accountDeleteAccountIDFlag = accountDeleteFlags.String("account-id", "REQUIRED", "Account ID")
 		accountDeleteUsernameFlag  = accountDeleteFlags.String("username", "REQUIRED", "")
 		accountDeletePasswordFlag  = accountDeleteFlags.String("password", "REQUIRED", "")
+
+		accountGroupAddFlags         = flag.NewFlagSet("group-add", flag.ExitOnError)
+		accountGroupAddAccountIDFlag = accountGroupAddFlags.String("account-id", "REQUIRED", "Account ID")
+		accountGroupAddGroupIDFlag   = accountGroupAddFlags.String("group-id", "REQUIRED", "Group ID")
+		accountGroupAddUsernameFlag  = accountGroupAddFlags.String("username", "REQUIRED", "")
+		accountGroupAddPasswordFlag  = accountGroupAddFlags.String("password", "REQUIRED", "")
+
+		accountGroupRemoveFlags         = flag.NewFlagSet("group-remove", flag.ExitOnError)
+		accountGroupRemoveAccountIDFlag = accountGroupRemoveFlags.String("account-id", "REQUIRED", "Account ID")
+		accountGroupRemoveGroupIDFlag   = accountGroupRemoveFlags.String("group-id", "REQUIRED", "Group ID")
+		accountGroupRemoveUsernameFlag  = accountGroupRemoveFlags.String("username", "REQUIRED", "")
+		accountGroupRemovePasswordFlag  = accountGroupRemoveFlags.String("password", "REQUIRED", "")
 	)
 	testFlags.Usage = testUsage
 	testTestFlags.Usage = testTestUsage
@@ -87,7 +110,11 @@ func ParseEndpoint(
 
 	accountFlags.Usage = accountUsage
 	accountCreateFlags.Usage = accountCreateUsage
+	accountGetFlags.Usage = accountGetUsage
+	accountUpdateFlags.Usage = accountUpdateUsage
 	accountDeleteFlags.Usage = accountDeleteUsage
+	accountGroupAddFlags.Usage = accountGroupAddUsage
+	accountGroupRemoveFlags.Usage = accountGroupRemoveUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -147,8 +174,20 @@ func ParseEndpoint(
 			case "create":
 				epf = accountCreateFlags
 
+			case "get":
+				epf = accountGetFlags
+
+			case "update":
+				epf = accountUpdateFlags
+
 			case "delete":
 				epf = accountDeleteFlags
+
+			case "group-add":
+				epf = accountGroupAddFlags
+
+			case "group-remove":
+				epf = accountGroupRemoveFlags
 
 			}
 
@@ -195,9 +234,21 @@ func ParseEndpoint(
 			case "create":
 				endpoint = c.Create()
 				data, err = accountc.BuildCreatePayload(*accountCreateBodyFlag, *accountCreateUsernameFlag, *accountCreatePasswordFlag)
+			case "get":
+				endpoint = c.Get()
+				data, err = accountc.BuildGetPayload(*accountGetAccountIDFlag, *accountGetUsernameFlag, *accountGetPasswordFlag)
+			case "update":
+				endpoint = c.Update()
+				data, err = accountc.BuildUpdatePayload(*accountUpdateBodyFlag, *accountUpdateAccountIDFlag, *accountUpdateUsernameFlag, *accountUpdatePasswordFlag)
 			case "delete":
 				endpoint = c.Delete()
 				data, err = accountc.BuildDeletePayload(*accountDeleteAccountIDFlag, *accountDeleteUsernameFlag, *accountDeletePasswordFlag)
+			case "group-add":
+				endpoint = c.GroupAdd()
+				data, err = accountc.BuildGroupAddPayload(*accountGroupAddAccountIDFlag, *accountGroupAddGroupIDFlag, *accountGroupAddUsernameFlag, *accountGroupAddPasswordFlag)
+			case "group-remove":
+				endpoint = c.GroupRemove()
+				data, err = accountc.BuildGroupRemovePayload(*accountGroupRemoveAccountIDFlag, *accountGroupRemoveGroupIDFlag, *accountGroupRemoveUsernameFlag, *accountGroupRemovePasswordFlag)
 			}
 		}
 	}
@@ -254,7 +305,7 @@ Account aggregation. Returns all known accounts
     -password STRING: 
 
 Example:
-    %[1]s aggregate accounts --username "Blanditiis dolorum minus." --password "Quia voluptatem quo iste."
+    %[1]s aggregate accounts --username "Facilis aut omnis voluptates minus voluptatem totam." --password "Nulla inventore sunt officia quas non."
 `, os.Args[0])
 }
 
@@ -266,7 +317,7 @@ Group aggregation. Returns list of all known groups
     -password STRING: 
 
 Example:
-    %[1]s aggregate groups --username "Earum repudiandae." --password "Voluptatem in officia blanditiis."
+    %[1]s aggregate groups --username "Unde omnis iste incidunt a." --password "Vitae provident sed voluptatem."
 `, os.Args[0])
 }
 
@@ -277,8 +328,12 @@ Usage:
     %[1]s [globalflags] account COMMAND [flags]
 
 COMMAND:
-    create: Create an account
+    create: Creates an account. Note that the client may choose to create a shadow account or hold the account in a temporary store until the actual account materializes.
+    get: Get account details
+    update: Update account details
     delete: Delete an account
+    group-add: Add an account to a group
+    group-remove: Remove an account from a group
 
 Additional help:
     %[1]s account COMMAND --help
@@ -287,17 +342,46 @@ Additional help:
 func accountCreateUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] account create -body JSON -username STRING -password STRING
 
-Create an account
+Creates an account. Note that the client may choose to create a shadow account or hold the account in a temporary store until the actual account materializes.
     -body JSON: 
-    -username STRING: Username
-    -password STRING: Password
+    -username STRING: 
+    -password STRING: 
 
 Example:
     %[1]s account create --body '{
       "email": "amos@hostedzonehere.com",
       "login": "amos",
       "name": "Amos Burton"
-   }' --username "Consequatur est quas distinctio labore." --password "Quo adipisci iste iste aut cupiditate."
+   }' --username "Molestiae consequatur dolorem pariatur vitae." --password "Omnis ut tenetur."
+`, os.Args[0])
+}
+
+func accountGetUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] account get -account-id STRING -username STRING -password STRING
+
+Get account details
+    -account-id STRING: Account ID
+    -username STRING: Username
+    -password STRING: Password
+
+Example:
+    %[1]s account get --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Consequatur maxime error voluptas et." --password "Qui cumque reiciendis."
+`, os.Args[0])
+}
+
+func accountUpdateUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] account update -body JSON -account-id STRING -username STRING -password STRING
+
+Update account details
+    -body JSON: 
+    -account-id STRING: Account ID
+    -username STRING: Username
+    -password STRING: Password
+
+Example:
+    %[1]s account update --body '{
+      "status": "active"
+   }' --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Fugiat at qui ipsum corrupti corporis." --password "Quia ut fuga natus aut."
 `, os.Args[0])
 }
 
@@ -310,6 +394,34 @@ Delete an account
     -password STRING: 
 
 Example:
-    %[1]s account delete --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Aperiam facilis aut omnis." --password "Minus voluptatem totam."
+    %[1]s account delete --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Ut illo voluptatem non dolorem at inventore." --password "Ullam aperiam rerum."
+`, os.Args[0])
+}
+
+func accountGroupAddUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] account group-add -account-id STRING -group-id STRING -username STRING -password STRING
+
+Add an account to a group
+    -account-id STRING: Account ID
+    -group-id STRING: Group ID
+    -username STRING: 
+    -password STRING: 
+
+Example:
+    %[1]s account group-add --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --group-id "4085f7a1-6956-4003-8a89-68931f31ab12" --username "Quod ut reiciendis eos quo praesentium est." --password "At amet quae nisi est exercitationem sint."
+`, os.Args[0])
+}
+
+func accountGroupRemoveUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] account group-remove -account-id STRING -group-id STRING -username STRING -password STRING
+
+Remove an account from a group
+    -account-id STRING: Account ID
+    -group-id STRING: Group ID
+    -username STRING: 
+    -password STRING: 
+
+Example:
+    %[1]s account group-remove --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --group-id "4085f7a1-6956-4003-8a89-68931f31ab12" --username "Eos quia officiis et eum at ut." --password "In consequatur."
 `, os.Args[0])
 }

@@ -3,7 +3,7 @@
 // aggregate client HTTP transport
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 

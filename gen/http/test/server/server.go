@@ -3,7 +3,7 @@
 // test HTTP server
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"net/http"
 
-	test "github.com/loafoe/sailpoint/gen/test"
+	test "github.com/loafoe/iamsale/gen/test"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

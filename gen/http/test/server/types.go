@@ -3,6 +3,6 @@
 // test HTTP server types
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server

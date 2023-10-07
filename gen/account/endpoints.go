@@ -3,7 +3,7 @@
 // account endpoints
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package account
 
@@ -16,8 +16,12 @@ import (
 
 // Endpoints wraps the "account" service endpoints.
 type Endpoints struct {
-	Create goa.Endpoint
-	Delete goa.Endpoint
+	Create      goa.Endpoint
+	Get         goa.Endpoint
+	Update      goa.Endpoint
+	Delete      goa.Endpoint
+	GroupAdd    goa.Endpoint
+	GroupRemove goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "account" service with endpoints.
@@ -25,15 +29,23 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Create: NewCreateEndpoint(s, a.BasicAuth),
-		Delete: NewDeleteEndpoint(s, a.BasicAuth),
+		Create:      NewCreateEndpoint(s, a.BasicAuth),
+		Get:         NewGetEndpoint(s, a.BasicAuth),
+		Update:      NewUpdateEndpoint(s, a.BasicAuth),
+		Delete:      NewDeleteEndpoint(s, a.BasicAuth),
+		GroupAdd:    NewGroupAddEndpoint(s, a.BasicAuth),
+		GroupRemove: NewGroupRemoveEndpoint(s, a.BasicAuth),
 	}
 }
 
 // Use applies the given middleware to all the "account" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Create = m(e.Create)
+	e.Get = m(e.Get)
+	e.Update = m(e.Update)
 	e.Delete = m(e.Delete)
+	e.GroupAdd = m(e.GroupAdd)
+	e.GroupRemove = m(e.GroupRemove)
 }
 
 // NewCreateEndpoint returns an endpoint function that calls the method
@@ -51,7 +63,45 @@ func NewCreateEndpoint(s Service, authBasicFn security.AuthBasicFunc) goa.Endpoi
 		if err != nil {
 			return nil, err
 		}
-		return nil, s.Create(ctx, p)
+		return s.Create(ctx, p)
+	}
+}
+
+// NewGetEndpoint returns an endpoint function that calls the method "get" of
+// service "account".
+func NewGetEndpoint(s Service, authBasicFn security.AuthBasicFunc) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*GetPayload)
+		var err error
+		sc := security.BasicScheme{
+			Name:           "BasicAuth",
+			Scopes:         []string{},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authBasicFn(ctx, p.Username, p.Password, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.Get(ctx, p)
+	}
+}
+
+// NewUpdateEndpoint returns an endpoint function that calls the method
+// "update" of service "account".
+func NewUpdateEndpoint(s Service, authBasicFn security.AuthBasicFunc) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UpdatePayload)
+		var err error
+		sc := security.BasicScheme{
+			Name:           "BasicAuth",
+			Scopes:         []string{},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authBasicFn(ctx, p.Username, p.Password, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.Update(ctx, p)
 	}
 }
 
@@ -71,5 +121,43 @@ func NewDeleteEndpoint(s Service, authBasicFn security.AuthBasicFunc) goa.Endpoi
 			return nil, err
 		}
 		return nil, s.Delete(ctx, p)
+	}
+}
+
+// NewGroupAddEndpoint returns an endpoint function that calls the method
+// "groupAdd" of service "account".
+func NewGroupAddEndpoint(s Service, authBasicFn security.AuthBasicFunc) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*GroupAddPayload)
+		var err error
+		sc := security.BasicScheme{
+			Name:           "BasicAuth",
+			Scopes:         []string{},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authBasicFn(ctx, p.Username, p.Password, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.GroupAdd(ctx, p)
+	}
+}
+
+// NewGroupRemoveEndpoint returns an endpoint function that calls the method
+// "groupRemove" of service "account".
+func NewGroupRemoveEndpoint(s Service, authBasicFn security.AuthBasicFunc) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*GroupRemovePayload)
+		var err error
+		sc := security.BasicScheme{
+			Name:           "BasicAuth",
+			Scopes:         []string{},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authBasicFn(ctx, p.Username, p.Password, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.GroupRemove(ctx, p)
 	}
 }

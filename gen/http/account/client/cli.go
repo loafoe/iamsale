@@ -3,7 +3,7 @@
 // account HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
@@ -11,7 +11,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	account "github.com/loafoe/sailpoint/gen/account"
+	account "github.com/loafoe/iamsale/gen/account"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildCreatePayload builds the payload for the account create endpoint from
@@ -33,7 +34,7 @@ func BuildCreatePayload(accountCreateBody string, accountCreateUsername string, 
 	{
 		password = accountCreatePassword
 	}
-	v := &account.Account{
+	v := &account.CreateAccount{
 		Name:  body.Name,
 		Login: body.Login,
 		Email: body.Email,
@@ -41,6 +42,71 @@ func BuildCreatePayload(accountCreateBody string, accountCreateUsername string, 
 	res := &account.CreatePayload{
 		Account: v,
 	}
+	res.Username = username
+	res.Password = password
+
+	return res, nil
+}
+
+// BuildGetPayload builds the payload for the account get endpoint from CLI
+// flags.
+func BuildGetPayload(accountGetAccountID string, accountGetUsername string, accountGetPassword string) (*account.GetPayload, error) {
+	var accountID string
+	{
+		accountID = accountGetAccountID
+	}
+	var username string
+	{
+		username = accountGetUsername
+	}
+	var password string
+	{
+		password = accountGetPassword
+	}
+	v := &account.GetPayload{}
+	v.AccountID = accountID
+	v.Username = username
+	v.Password = password
+
+	return v, nil
+}
+
+// BuildUpdatePayload builds the payload for the account update endpoint from
+// CLI flags.
+func BuildUpdatePayload(accountUpdateBody string, accountUpdateAccountID string, accountUpdateUsername string, accountUpdatePassword string) (*account.UpdatePayload, error) {
+	var err error
+	var body UpdateRequestBody
+	{
+		err = json.Unmarshal([]byte(accountUpdateBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"status\": \"active\"\n   }'")
+		}
+		if !(body.Status == "active" || body.Status == "disabled") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", body.Status, []any{"active", "disabled"}))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var accountID string
+	{
+		accountID = accountUpdateAccountID
+	}
+	var username string
+	{
+		username = accountUpdateUsername
+	}
+	var password string
+	{
+		password = accountUpdatePassword
+	}
+	v := &account.UpdateAccount{
+		Status: body.Status,
+	}
+	res := &account.UpdatePayload{
+		Account: v,
+	}
+	res.AccountID = accountID
 	res.Username = username
 	res.Password = password
 
@@ -64,6 +130,62 @@ func BuildDeletePayload(accountDeleteAccountID string, accountDeleteUsername str
 	}
 	v := &account.DeletePayload{}
 	v.AccountID = accountID
+	v.Username = username
+	v.Password = password
+
+	return v, nil
+}
+
+// BuildGroupAddPayload builds the payload for the account groupAdd endpoint
+// from CLI flags.
+func BuildGroupAddPayload(accountGroupAddAccountID string, accountGroupAddGroupID string, accountGroupAddUsername string, accountGroupAddPassword string) (*account.GroupAddPayload, error) {
+	var accountID string
+	{
+		accountID = accountGroupAddAccountID
+	}
+	var groupID string
+	{
+		groupID = accountGroupAddGroupID
+	}
+	var username string
+	{
+		username = accountGroupAddUsername
+	}
+	var password string
+	{
+		password = accountGroupAddPassword
+	}
+	v := &account.GroupAddPayload{}
+	v.AccountID = accountID
+	v.GroupID = groupID
+	v.Username = username
+	v.Password = password
+
+	return v, nil
+}
+
+// BuildGroupRemovePayload builds the payload for the account groupRemove
+// endpoint from CLI flags.
+func BuildGroupRemovePayload(accountGroupRemoveAccountID string, accountGroupRemoveGroupID string, accountGroupRemoveUsername string, accountGroupRemovePassword string) (*account.GroupRemovePayload, error) {
+	var accountID string
+	{
+		accountID = accountGroupRemoveAccountID
+	}
+	var groupID string
+	{
+		groupID = accountGroupRemoveGroupID
+	}
+	var username string
+	{
+		username = accountGroupRemoveUsername
+	}
+	var password string
+	{
+		password = accountGroupRemovePassword
+	}
+	v := &account.GroupRemovePayload{}
+	v.AccountID = accountID
+	v.GroupID = groupID
 	v.Username = username
 	v.Password = password
 

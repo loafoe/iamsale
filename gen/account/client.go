@@ -3,7 +3,7 @@
 // account client
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package account
 
@@ -15,26 +15,70 @@ import (
 
 // Client is the "account" service client.
 type Client struct {
-	CreateEndpoint goa.Endpoint
-	DeleteEndpoint goa.Endpoint
+	CreateEndpoint      goa.Endpoint
+	GetEndpoint         goa.Endpoint
+	UpdateEndpoint      goa.Endpoint
+	DeleteEndpoint      goa.Endpoint
+	GroupAddEndpoint    goa.Endpoint
+	GroupRemoveEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "account" service client given the endpoints.
-func NewClient(create, delete_ goa.Endpoint) *Client {
+func NewClient(create, get, update, delete_, groupAdd, groupRemove goa.Endpoint) *Client {
 	return &Client{
-		CreateEndpoint: create,
-		DeleteEndpoint: delete_,
+		CreateEndpoint:      create,
+		GetEndpoint:         get,
+		UpdateEndpoint:      update,
+		DeleteEndpoint:      delete_,
+		GroupAddEndpoint:    groupAdd,
+		GroupRemoveEndpoint: groupRemove,
 	}
 }
 
 // Create calls the "create" endpoint of the "account" service.
-func (c *Client) Create(ctx context.Context, p *CreatePayload) (err error) {
-	_, err = c.CreateEndpoint(ctx, p)
-	return
+func (c *Client) Create(ctx context.Context, p *CreatePayload) (res *Account, err error) {
+	var ires any
+	ires, err = c.CreateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Account), nil
+}
+
+// Get calls the "get" endpoint of the "account" service.
+func (c *Client) Get(ctx context.Context, p *GetPayload) (res *Account, err error) {
+	var ires any
+	ires, err = c.GetEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Account), nil
+}
+
+// Update calls the "update" endpoint of the "account" service.
+func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *Account, err error) {
+	var ires any
+	ires, err = c.UpdateEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Account), nil
 }
 
 // Delete calls the "delete" endpoint of the "account" service.
 func (c *Client) Delete(ctx context.Context, p *DeletePayload) (err error) {
 	_, err = c.DeleteEndpoint(ctx, p)
+	return
+}
+
+// GroupAdd calls the "groupAdd" endpoint of the "account" service.
+func (c *Client) GroupAdd(ctx context.Context, p *GroupAddPayload) (err error) {
+	_, err = c.GroupAddEndpoint(ctx, p)
+	return
+}
+
+// GroupRemove calls the "groupRemove" endpoint of the "account" service.
+func (c *Client) GroupRemove(ctx context.Context, p *GroupRemovePayload) (err error) {
+	_, err = c.GroupRemoveEndpoint(ctx, p)
 	return
 }

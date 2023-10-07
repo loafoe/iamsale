@@ -3,6 +3,6 @@
 // test HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client

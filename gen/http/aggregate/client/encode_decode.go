@@ -3,7 +3,7 @@
 // aggregate HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
@@ -14,8 +14,9 @@ import (
 	"net/http"
 	"net/url"
 
-	aggregate "github.com/loafoe/sailpoint/gen/aggregate"
+	aggregate "github.com/loafoe/iamsale/gen/aggregate"
 	goahttp "goa.design/goa/v3/http"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAccountsRequest instantiates a HTTP request object with method and path
@@ -75,6 +76,16 @@ func DecodeAccountsResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("aggregate", "accounts", err)
+			}
+			for _, e := range body {
+				if e != nil {
+					if err2 := ValidateAccountResponse(e); err2 != nil {
+						err = goa.MergeErrors(err, err2)
+					}
+				}
+			}
+			if err != nil {
+				return nil, goahttp.ErrValidationError("aggregate", "accounts", err)
 			}
 			res := NewAccountsAccountOK(body)
 			return res, nil
@@ -184,9 +195,11 @@ func DecodeGroupsResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 // *aggregate.Account from a value of type *AccountResponse.
 func unmarshalAccountResponseToAggregateAccount(v *AccountResponse) *aggregate.Account {
 	res := &aggregate.Account{
-		Name:  v.Name,
-		Login: v.Login,
-		Email: v.Email,
+		ID:     v.ID,
+		Name:   *v.Name,
+		Login:  *v.Login,
+		Email:  *v.Email,
+		Status: v.Status,
 	}
 
 	return res

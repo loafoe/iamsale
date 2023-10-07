@@ -3,7 +3,7 @@
 // account client HTTP transport
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
@@ -20,8 +20,22 @@ type Client struct {
 	// Create Doer is the HTTP client used to make requests to the create endpoint.
 	CreateDoer goahttp.Doer
 
+	// Get Doer is the HTTP client used to make requests to the get endpoint.
+	GetDoer goahttp.Doer
+
+	// Update Doer is the HTTP client used to make requests to the update endpoint.
+	UpdateDoer goahttp.Doer
+
 	// Delete Doer is the HTTP client used to make requests to the delete endpoint.
 	DeleteDoer goahttp.Doer
+
+	// GroupAdd Doer is the HTTP client used to make requests to the groupAdd
+	// endpoint.
+	GroupAddDoer goahttp.Doer
+
+	// GroupRemove Doer is the HTTP client used to make requests to the groupRemove
+	// endpoint.
+	GroupRemoveDoer goahttp.Doer
 
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
@@ -44,7 +58,11 @@ func NewClient(
 ) *Client {
 	return &Client{
 		CreateDoer:          doer,
+		GetDoer:             doer,
+		UpdateDoer:          doer,
 		DeleteDoer:          doer,
+		GroupAddDoer:        doer,
+		GroupRemoveDoer:     doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -77,6 +95,54 @@ func (c *Client) Create() goa.Endpoint {
 	}
 }
 
+// Get returns an endpoint that makes HTTP requests to the account service get
+// server.
+func (c *Client) Get() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGetRequest(c.encoder)
+		decodeResponse = DecodeGetResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGetRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("account", "get", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Update returns an endpoint that makes HTTP requests to the account service
+// update server.
+func (c *Client) Update() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateRequest(c.encoder)
+		decodeResponse = DecodeUpdateResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUpdateRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("account", "update", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
 // Delete returns an endpoint that makes HTTP requests to the account service
 // delete server.
 func (c *Client) Delete() goa.Endpoint {
@@ -96,6 +162,54 @@ func (c *Client) Delete() goa.Endpoint {
 		resp, err := c.DeleteDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("account", "delete", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GroupAdd returns an endpoint that makes HTTP requests to the account service
+// groupAdd server.
+func (c *Client) GroupAdd() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGroupAddRequest(c.encoder)
+		decodeResponse = DecodeGroupAddResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGroupAddRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GroupAddDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("account", "groupAdd", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GroupRemove returns an endpoint that makes HTTP requests to the account
+// service groupRemove server.
+func (c *Client) GroupRemove() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGroupRemoveRequest(c.encoder)
+		decodeResponse = DecodeGroupRemoveResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildGroupRemoveRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GroupRemoveDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("account", "groupRemove", err)
 		}
 		return decodeResponse(resp)
 	}

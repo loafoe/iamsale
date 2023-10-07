@@ -3,12 +3,12 @@
 // aggregate HTTP client types
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
 import (
-	aggregate "github.com/loafoe/sailpoint/gen/aggregate"
+	aggregate "github.com/loafoe/iamsale/gen/aggregate"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -58,12 +58,16 @@ type GroupsPermissionDeniedResponseBody struct {
 
 // AccountResponse is used to define fields on response body types.
 type AccountResponse struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
 	// Name of user
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// Login of user
 	Login *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
 	// Email of user
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Email *string `gorm:"index"`
+	// Status of account
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }
 
 // GroupResponse is used to define fields on response body types.
@@ -170,6 +174,25 @@ func ValidateGroupsPermissionDeniedResponseBody(body *GroupsPermissionDeniedResp
 	}
 	if body.Fault == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateAccountResponse runs the validations defined on AccountResponse
+func ValidateAccountResponse(body *AccountResponse) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Login == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("login", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Status != nil {
+		if !(*body.Status == "active" || *body.Status == "disabled") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled"}))
+		}
 	}
 	return
 }

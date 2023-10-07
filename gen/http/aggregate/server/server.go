@@ -3,7 +3,7 @@
 // aggregate HTTP server
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"net/http"
 
-	aggregate "github.com/loafoe/sailpoint/gen/aggregate"
+	aggregate "github.com/loafoe/iamsale/gen/aggregate"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

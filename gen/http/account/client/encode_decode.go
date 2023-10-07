@@ -3,7 +3,7 @@
 // account HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
@@ -14,7 +14,7 @@ import (
 	"net/http"
 	"net/url"
 
-	account "github.com/loafoe/sailpoint/gen/account"
+	account "github.com/loafoe/iamsale/gen/account"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -69,10 +69,183 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		}
 		switch resp.StatusCode {
 		case http.StatusCreated:
-			return nil, nil
+			var (
+				body CreateResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("account", "create", err)
+			}
+			err = ValidateCreateResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("account", "create", err)
+			}
+			res := NewCreateAccountCreated(&body)
+			return res, nil
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("account", "create", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildGetRequest instantiates a HTTP request object with method and path set
+// to call the "account" service "get" endpoint
+func (c *Client) BuildGetRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		accountID string
+	)
+	{
+		p, ok := v.(*account.GetPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("account", "get", "*account.GetPayload", v)
+		}
+		accountID = p.AccountID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAccountPath(accountID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("account", "get", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGetRequest returns an encoder for requests sent to the account get
+// server.
+func EncodeGetRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*account.GetPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("account", "get", "*account.GetPayload", v)
+		}
+		req.SetBasicAuth(p.Username, p.Password)
+		return nil
+	}
+}
+
+// DecodeGetResponse returns a decoder for responses returned by the account
+// get endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeGetResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("account", "get", err)
+			}
+			err = ValidateGetResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("account", "get", err)
+			}
+			res := NewGetAccountOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("account", "get", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildUpdateRequest instantiates a HTTP request object with method and path
+// set to call the "account" service "update" endpoint
+func (c *Client) BuildUpdateRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		accountID string
+	)
+	{
+		p, ok := v.(*account.UpdatePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("account", "update", "*account.UpdatePayload", v)
+		}
+		accountID = p.AccountID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateAccountPath(accountID)}
+	req, err := http.NewRequest("PUT", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("account", "update", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateRequest returns an encoder for requests sent to the account
+// update server.
+func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*account.UpdatePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("account", "update", "*account.UpdatePayload", v)
+		}
+		body := NewUpdateRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("account", "update", err)
+		}
+		req.SetBasicAuth(p.Username, p.Password)
+		return nil
+	}
+}
+
+// DecodeUpdateResponse returns a decoder for responses returned by the account
+// update endpoint. restoreBody controls whether the response body should be
+// restored after having been read.
+func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("account", "update", err)
+			}
+			err = ValidateUpdateResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("account", "update", err)
+			}
+			res := NewUpdateAccountOK(&body)
+			return res, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("account", "update", resp.StatusCode, string(body))
 		}
 	}
 }
@@ -138,6 +311,140 @@ func DecodeDeleteResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("account", "delete", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildGroupAddRequest instantiates a HTTP request object with method and path
+// set to call the "account" service "groupAdd" endpoint
+func (c *Client) BuildGroupAddRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		accountID string
+		groupID   string
+	)
+	{
+		p, ok := v.(*account.GroupAddPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("account", "groupAdd", "*account.GroupAddPayload", v)
+		}
+		accountID = p.AccountID
+		groupID = p.GroupID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GroupAddAccountPath(accountID, groupID)}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("account", "groupAdd", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGroupAddRequest returns an encoder for requests sent to the account
+// groupAdd server.
+func EncodeGroupAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*account.GroupAddPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("account", "groupAdd", "*account.GroupAddPayload", v)
+		}
+		req.SetBasicAuth(p.Username, p.Password)
+		return nil
+	}
+}
+
+// DecodeGroupAddResponse returns a decoder for responses returned by the
+// account groupAdd endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+func DecodeGroupAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("account", "groupAdd", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildGroupRemoveRequest instantiates a HTTP request object with method and
+// path set to call the "account" service "groupRemove" endpoint
+func (c *Client) BuildGroupRemoveRequest(ctx context.Context, v any) (*http.Request, error) {
+	var (
+		accountID string
+		groupID   string
+	)
+	{
+		p, ok := v.(*account.GroupRemovePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("account", "groupRemove", "*account.GroupRemovePayload", v)
+		}
+		accountID = p.AccountID
+		groupID = p.GroupID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GroupRemoveAccountPath(accountID, groupID)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("account", "groupRemove", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGroupRemoveRequest returns an encoder for requests sent to the account
+// groupRemove server.
+func EncodeGroupRemoveRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*account.GroupRemovePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("account", "groupRemove", "*account.GroupRemovePayload", v)
+		}
+		req.SetBasicAuth(p.Username, p.Password)
+		return nil
+	}
+}
+
+// DecodeGroupRemoveResponse returns a decoder for responses returned by the
+// account groupRemove endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+func DecodeGroupRemoveResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("account", "groupRemove", resp.StatusCode, string(body))
 		}
 	}
 }

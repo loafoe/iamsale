@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-    title: Sailpoint integration
-    description: Implements the integration API for sailpoint
-    version: "1.0"
+    title: IAM to broker identity integration
+    description: An integration API towards identity brokers.
+    version: "1"
 servers:
     - url: http://localhost:8088
 paths:
@@ -11,14 +11,14 @@ paths:
             tags:
                 - account
             summary: create account
-            description: Create an account
+            description: Creates an account. Note that the client may choose to create a shadow account or hold the account in a temporary store until the actual account materializes.
             operationId: account#create
             requestBody:
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Account'
+                            $ref: '#/components/schemas/CreateAccount'
                         example:
                             email: amos@hostedzonehere.com
                             login: amos
@@ -26,6 +26,16 @@ paths:
             responses:
                 "201":
                     description: Created response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Account'
+                            example:
+                                email: amos@hostedzonehere.com
+                                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                login: amos
+                                name: Amos Burton
+                                status: disabled
             security:
                 - BasicAuth_header_Authorization: []
     /account/{accountId}:
@@ -50,6 +60,137 @@ paths:
                     description: No Content response.
             security:
                 - BasicAuth_header_Authorization: []
+        get:
+            tags:
+                - account
+            summary: get account
+            description: Get account details
+            operationId: account#get
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  schema:
+                    type: string
+                    description: Account ID
+                    example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+                  example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Account'
+                            example:
+                                email: amos@hostedzonehere.com
+                                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                login: amos
+                                name: Amos Burton
+                                status: disabled
+            security:
+                - BasicAuth_header_Authorization: []
+        put:
+            tags:
+                - account
+            summary: update account
+            description: Update account details
+            operationId: account#update
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  schema:
+                    type: string
+                    description: Account ID
+                    example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+                  example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateAccount'
+                        example:
+                            status: active
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Account'
+                            example:
+                                email: amos@hostedzonehere.com
+                                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                login: amos
+                                name: Amos Burton
+                                status: disabled
+            security:
+                - BasicAuth_header_Authorization: []
+    /account/{accountId}/group/{groupId}:
+        delete:
+            tags:
+                - account
+            summary: groupRemove account
+            description: Remove an account from a group
+            operationId: account#groupRemove
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  schema:
+                    type: string
+                    description: Account ID
+                    example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+                  example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+                - name: groupId
+                  in: path
+                  description: Group ID
+                  required: true
+                  schema:
+                    type: string
+                    description: Group ID
+                    example: 4085f7a1-6956-4003-8a89-68931f31ab12
+                  example: 4085f7a1-6956-4003-8a89-68931f31ab12
+            responses:
+                "204":
+                    description: No Content response.
+            security:
+                - BasicAuth_header_Authorization: []
+        post:
+            tags:
+                - account
+            summary: groupAdd account
+            description: Add an account to a group
+            operationId: account#groupAdd
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  schema:
+                    type: string
+                    description: Account ID
+                    example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+                  example: 18ee082f-1d61-40d3-b8a2-f4eee67cefff
+                - name: groupId
+                  in: path
+                  description: Group ID
+                  required: true
+                  schema:
+                    type: string
+                    description: Group ID
+                    example: 4085f7a1-6956-4003-8a89-68931f31ab12
+                  example: 4085f7a1-6956-4003-8a89-68931f31ab12
+            responses:
+                "204":
+                    description: No Content response.
+            security:
+                - BasicAuth_header_Authorization: []
     /aggregate/accounts:
         get:
             tags:
@@ -68,27 +209,41 @@ paths:
                                     $ref: '#/components/schemas/Account'
                                 example:
                                     - email: amos@hostedzonehere.com
+                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
                                       login: amos
                                       name: Amos Burton
+                                      status: active
                                     - email: amos@hostedzonehere.com
+                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
                                       login: amos
                                       name: Amos Burton
+                                      status: active
                                     - email: amos@hostedzonehere.com
+                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
                                       login: amos
                                       name: Amos Burton
-                                    - email: amos@hostedzonehere.com
-                                      login: amos
-                                      name: Amos Burton
+                                      status: active
                             example:
                                 - email: amos@hostedzonehere.com
+                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
                                   login: amos
                                   name: Amos Burton
+                                  status: active
                                 - email: amos@hostedzonehere.com
+                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
                                   login: amos
                                   name: Amos Burton
+                                  status: active
                                 - email: amos@hostedzonehere.com
+                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
                                   login: amos
                                   name: Amos Burton
+                                  status: active
+                                - email: amos@hostedzonehere.com
+                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                  login: amos
+                                  name: Amos Burton
+                                  status: active
                 "403":
                     description: 'PermissionDenied: Forbidden response.'
                     content:
@@ -118,13 +273,7 @@ paths:
                                       name: GROUPNAME
                                     - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                       name: GROUPNAME
-                                    - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
-                                      name: GROUPNAME
-                                    - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
-                                      name: GROUPNAME
                             example:
-                                - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
-                                  name: GROUPNAME
                                 - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                   name: GROUPNAME
                                 - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
@@ -157,6 +306,42 @@ components:
                     type: string
                     description: Email of user
                     example: amos@hostedzonehere.com
+                id:
+                    type: string
+                    description: ID of account
+                    example: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                login:
+                    type: string
+                    description: Login of user
+                    example: amos
+                name:
+                    type: string
+                    description: Name of user
+                    example: Amos Burton
+                status:
+                    type: string
+                    description: Status of account
+                    example: active
+                    enum:
+                        - active
+                        - disabled
+            example:
+                email: amos@hostedzonehere.com
+                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                login: amos
+                name: Amos Burton
+                status: active
+            required:
+                - name
+                - login
+                - email
+        CreateAccount:
+            type: object
+            properties:
+                email:
+                    type: string
+                    description: Email of user
+                    example: amos@hostedzonehere.com
                 login:
                     type: string
                     description: Login of user
@@ -169,13 +354,17 @@ components:
                 email: amos@hostedzonehere.com
                 login: amos
                 name: Amos Burton
+            required:
+                - name
+                - login
+                - email
         Error:
             type: object
             properties:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: true
+                    example: false
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -191,17 +380,17 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: true
+                    example: false
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: false
+                    example: true
             example:
                 fault: true
                 id: 123abc
                 message: parameter 'p' must be an integer
                 name: bad_request
-                temporary: false
+                temporary: true
                 timeout: true
             required:
                 - name
@@ -224,6 +413,20 @@ components:
             example:
                 guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
                 name: GROUPNAME
+        UpdateAccount:
+            type: object
+            properties:
+                status:
+                    type: string
+                    description: Status of user
+                    example: disabled
+                    enum:
+                        - active
+                        - disabled
+            example:
+                status: disabled
+            required:
+                - status
     securitySchemes:
         BasicAuth_header_Authorization:
             type: http

@@ -3,12 +3,12 @@
 // aggregate HTTP server types
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server
 
 import (
-	aggregate "github.com/loafoe/sailpoint/gen/aggregate"
+	aggregate "github.com/loafoe/iamsale/gen/aggregate"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -58,12 +58,16 @@ type GroupsPermissionDeniedResponseBody struct {
 
 // AccountResponse is used to define fields on response body types.
 type AccountResponse struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
 	// Name of user
-	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Name string `form:"name" json:"name" xml:"name"`
 	// Login of user
-	Login *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
+	Login string `form:"login" json:"login" xml:"login"`
 	// Email of user
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Email string `gorm:"index"`
+	// Status of account
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }
 
 // GroupResponse is used to define fields on response body types.

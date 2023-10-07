@@ -3,12 +3,12 @@
 // aggregate HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
 import (
-	aggregate "github.com/loafoe/sailpoint/gen/aggregate"
+	aggregate "github.com/loafoe/iamsale/gen/aggregate"
 )
 
 // BuildAccountsPayload builds the payload for the aggregate accounts endpoint

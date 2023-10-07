@@ -3,7 +3,7 @@
 // aggregate service
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package aggregate
 
@@ -39,12 +39,16 @@ const ServiceName = "aggregate"
 var MethodNames = [2]string{"accounts", "groups"}
 
 type Account struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
 	// Name of user
-	Name *string
+	Name string
 	// Login of user
-	Login *string
+	Login string
 	// Email of user
-	Email *string
+	Email string `gorm:"index"`
+	// Status of account
+	Status *string
 }
 
 // AccountsPayload is the payload type of the aggregate service accounts method.

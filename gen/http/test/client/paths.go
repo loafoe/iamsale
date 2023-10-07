@@ -3,7 +3,7 @@
 // HTTP request path constructors for the test service.
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 

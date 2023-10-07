@@ -1,8 +1,8 @@
 swagger: "2.0"
 info:
-    title: Sailpoint integration
-    description: Implements the integration API for sailpoint
-    version: ""
+    title: IAM to broker identity integration
+    description: An integration API towards identity brokers.
+    version: "1"
 host: localhost:8088
 consumes:
     - application/json
@@ -18,7 +18,7 @@ paths:
             tags:
                 - account
             summary: create account
-            description: Create an account
+            description: Creates an account. Note that the client may choose to create a shadow account or hold the account in a temporary store until the actual account materializes.
             operationId: account#create
             parameters:
                 - name: Authorization
@@ -34,11 +34,82 @@ paths:
             responses:
                 "201":
                     description: Created response.
+                    schema:
+                        $ref: '#/definitions/AccountCreateResponseBody'
+                        required:
+                            - name
+                            - login
+                            - email
             schemes:
                 - http
             security:
                 - BasicAuth_header_Authorization: []
     /account/{accountId}:
+        get:
+            tags:
+                - account
+            summary: get account
+            description: Get account details
+            operationId: account#get
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  type: string
+                - name: Authorization
+                  in: header
+                  description: Basic Auth security using Basic scheme (https://tools.ietf.org/html/rfc7617)
+                  required: true
+                  type: string
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/AccountGetResponseBody'
+                        required:
+                            - name
+                            - login
+                            - email
+            schemes:
+                - http
+            security:
+                - BasicAuth_header_Authorization: []
+        put:
+            tags:
+                - account
+            summary: update account
+            description: Update account details
+            operationId: account#update
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  type: string
+                - name: Authorization
+                  in: header
+                  description: Basic Auth security using Basic scheme (https://tools.ietf.org/html/rfc7617)
+                  required: true
+                  type: string
+                - name: UpdateRequestBody
+                  in: body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/AccountUpdateRequestBody'
+            responses:
+                "200":
+                    description: OK response.
+                    schema:
+                        $ref: '#/definitions/AccountUpdateResponseBody'
+                        required:
+                            - name
+                            - login
+                            - email
+            schemes:
+                - http
+            security:
+                - BasicAuth_header_Authorization: []
         delete:
             tags:
                 - account
@@ -49,6 +120,65 @@ paths:
                 - name: accountId
                   in: path
                   description: Account ID
+                  required: true
+                  type: string
+                - name: Authorization
+                  in: header
+                  description: Basic Auth security using Basic scheme (https://tools.ietf.org/html/rfc7617)
+                  required: true
+                  type: string
+            responses:
+                "204":
+                    description: No Content response.
+            schemes:
+                - http
+            security:
+                - BasicAuth_header_Authorization: []
+    /account/{accountId}/group/{groupId}:
+        post:
+            tags:
+                - account
+            summary: groupAdd account
+            description: Add an account to a group
+            operationId: account#groupAdd
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  type: string
+                - name: groupId
+                  in: path
+                  description: Group ID
+                  required: true
+                  type: string
+                - name: Authorization
+                  in: header
+                  description: Basic Auth security using Basic scheme (https://tools.ietf.org/html/rfc7617)
+                  required: true
+                  type: string
+            responses:
+                "204":
+                    description: No Content response.
+            schemes:
+                - http
+            security:
+                - BasicAuth_header_Authorization: []
+        delete:
+            tags:
+                - account
+            summary: groupRemove account
+            description: Remove an account from a group
+            operationId: account#groupRemove
+            parameters:
+                - name: accountId
+                  in: path
+                  description: Account ID
+                  required: true
+                  type: string
+                - name: groupId
+                  in: path
+                  description: Group ID
                   required: true
                   type: string
                 - name: Authorization
@@ -151,14 +281,22 @@ definitions:
             email: amos@hostedzonehere.com
             login: amos
             name: Amos Burton
-    AccountResponse:
-        title: AccountResponse
+        required:
+            - name
+            - login
+            - email
+    AccountCreateResponseBody:
+        title: AccountCreateResponseBody
         type: object
         properties:
             email:
                 type: string
                 description: Email of user
                 example: amos@hostedzonehere.com
+            id:
+                type: string
+                description: ID of account
+                example: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
             login:
                 type: string
                 description: Login of user
@@ -167,10 +305,149 @@ definitions:
                 type: string
                 description: Name of user
                 example: Amos Burton
+            status:
+                type: string
+                description: Status of account
+                example: active
+                enum:
+                    - active
+                    - disabled
         example:
             email: amos@hostedzonehere.com
+            id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
             login: amos
             name: Amos Burton
+            status: disabled
+        required:
+            - name
+            - login
+            - email
+    AccountGetResponseBody:
+        title: AccountGetResponseBody
+        type: object
+        properties:
+            email:
+                type: string
+                description: Email of user
+                example: amos@hostedzonehere.com
+            id:
+                type: string
+                description: ID of account
+                example: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+            login:
+                type: string
+                description: Login of user
+                example: amos
+            name:
+                type: string
+                description: Name of user
+                example: Amos Burton
+            status:
+                type: string
+                description: Status of account
+                example: disabled
+                enum:
+                    - active
+                    - disabled
+        example:
+            email: amos@hostedzonehere.com
+            id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+            login: amos
+            name: Amos Burton
+            status: active
+        required:
+            - name
+            - login
+            - email
+    AccountResponse:
+        title: AccountResponse
+        type: object
+        properties:
+            email:
+                type: string
+                description: Email of user
+                example: amos@hostedzonehere.com
+            id:
+                type: string
+                description: ID of account
+                example: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+            login:
+                type: string
+                description: Login of user
+                example: amos
+            name:
+                type: string
+                description: Name of user
+                example: Amos Burton
+            status:
+                type: string
+                description: Status of account
+                example: active
+                enum:
+                    - active
+                    - disabled
+        example:
+            email: amos@hostedzonehere.com
+            id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+            login: amos
+            name: Amos Burton
+            status: disabled
+        required:
+            - name
+            - login
+            - email
+    AccountUpdateRequestBody:
+        title: AccountUpdateRequestBody
+        type: object
+        properties:
+            status:
+                type: string
+                description: Status of user
+                example: disabled
+                enum:
+                    - active
+                    - disabled
+        example:
+            status: disabled
+        required:
+            - status
+    AccountUpdateResponseBody:
+        title: AccountUpdateResponseBody
+        type: object
+        properties:
+            email:
+                type: string
+                description: Email of user
+                example: amos@hostedzonehere.com
+            id:
+                type: string
+                description: ID of account
+                example: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+            login:
+                type: string
+                description: Login of user
+                example: amos
+            name:
+                type: string
+                description: Name of user
+                example: Amos Burton
+            status:
+                type: string
+                description: Status of account
+                example: active
+                enum:
+                    - active
+                    - disabled
+        example:
+            email: amos@hostedzonehere.com
+            id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+            login: amos
+            name: Amos Burton
+            status: active
+        required:
+            - name
+            - login
+            - email
     AggregateAccountsPermissionDeniedResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object
@@ -198,14 +475,14 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: false
+                example: true
         description: accounts_PermissionDenied_response_body result type (default view)
         example:
-            fault: true
+            fault: false
             id: 123abc
             message: parameter 'p' must be an integer
             name: bad_request
-            temporary: false
+            temporary: true
             timeout: true
         required:
             - name
@@ -221,7 +498,7 @@ definitions:
             fault:
                 type: boolean
                 description: Is the error a server-side fault?
-                example: true
+                example: false
             id:
                 type: string
                 description: ID is a unique identifier for this particular occurrence of the problem.
@@ -241,7 +518,7 @@ definitions:
             timeout:
                 type: boolean
                 description: Is the error a timeout?
-                example: true
+                example: false
         description: groups_PermissionDenied_response_body result type (default view)
         example:
             fault: false

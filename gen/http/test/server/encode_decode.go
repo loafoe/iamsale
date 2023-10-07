@@ -3,7 +3,7 @@
 // test HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server
 

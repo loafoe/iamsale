@@ -3,7 +3,7 @@
 // aggregate HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"errors"
 	"net/http"
 
-	aggregate "github.com/loafoe/sailpoint/gen/aggregate"
+	aggregate "github.com/loafoe/iamsale/gen/aggregate"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -135,9 +135,11 @@ func EncodeGroupsError(encoder func(context.Context, http.ResponseWriter) goahtt
 // *AccountResponse from a value of type *aggregate.Account.
 func marshalAggregateAccountToAccountResponse(v *aggregate.Account) *AccountResponse {
 	res := &AccountResponse{
-		Name:  v.Name,
-		Login: v.Login,
-		Email: v.Email,
+		ID:     v.ID,
+		Name:   v.Name,
+		Login:  v.Login,
+		Email:  v.Email,
+		Status: v.Status,
 	}
 
 	return res

@@ -3,7 +3,7 @@
 // account HTTP server
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package server
 
@@ -11,16 +11,20 @@ import (
 	"context"
 	"net/http"
 
-	account "github.com/loafoe/sailpoint/gen/account"
+	account "github.com/loafoe/iamsale/gen/account"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
 
 // Server lists the account service endpoint HTTP handlers.
 type Server struct {
-	Mounts []*MountPoint
-	Create http.Handler
-	Delete http.Handler
+	Mounts      []*MountPoint
+	Create      http.Handler
+	Get         http.Handler
+	Update      http.Handler
+	Delete      http.Handler
+	GroupAdd    http.Handler
+	GroupRemove http.Handler
 }
 
 // MountPoint holds information about the mounted endpoints.
@@ -51,10 +55,18 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Create", "POST", "/account"},
+			{"Get", "GET", "/account/{accountId}"},
+			{"Update", "PUT", "/account/{accountId}"},
 			{"Delete", "DELETE", "/account/{accountId}"},
+			{"GroupAdd", "POST", "/account/{accountId}/group/{groupId}"},
+			{"GroupRemove", "DELETE", "/account/{accountId}/group/{groupId}"},
 		},
-		Create: NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
-		Delete: NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		Create:      NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
+		Get:         NewGetHandler(e.Get, mux, decoder, encoder, errhandler, formatter),
+		Update:      NewUpdateHandler(e.Update, mux, decoder, encoder, errhandler, formatter),
+		Delete:      NewDeleteHandler(e.Delete, mux, decoder, encoder, errhandler, formatter),
+		GroupAdd:    NewGroupAddHandler(e.GroupAdd, mux, decoder, encoder, errhandler, formatter),
+		GroupRemove: NewGroupRemoveHandler(e.GroupRemove, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -64,7 +76,11 @@ func (s *Server) Service() string { return "account" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Create = m(s.Create)
+	s.Get = m(s.Get)
+	s.Update = m(s.Update)
 	s.Delete = m(s.Delete)
+	s.GroupAdd = m(s.GroupAdd)
+	s.GroupRemove = m(s.GroupRemove)
 }
 
 // MethodNames returns the methods served.
@@ -73,7 +89,11 @@ func (s *Server) MethodNames() []string { return account.MethodNames[:] }
 // Mount configures the mux to serve the account endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountCreateHandler(mux, h.Create)
+	MountGetHandler(mux, h.Get)
+	MountUpdateHandler(mux, h.Update)
 	MountDeleteHandler(mux, h.Delete)
+	MountGroupAddHandler(mux, h.GroupAdd)
+	MountGroupRemoveHandler(mux, h.GroupRemove)
 }
 
 // Mount configures the mux to serve the account endpoints.
@@ -132,6 +152,108 @@ func NewCreateHandler(
 	})
 }
 
+// MountGetHandler configures the mux to serve the "account" service "get"
+// endpoint.
+func MountGetHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/account/{accountId}", f)
+}
+
+// NewGetHandler creates a HTTP handler which loads the HTTP request and calls
+// the "account" service "get" endpoint.
+func NewGetHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetRequest(mux, decoder)
+		encodeResponse = EncodeGetResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "get")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "account")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUpdateHandler configures the mux to serve the "account" service
+// "update" endpoint.
+func MountUpdateHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("PUT", "/account/{accountId}", f)
+}
+
+// NewUpdateHandler creates a HTTP handler which loads the HTTP request and
+// calls the "account" service "update" endpoint.
+func NewUpdateHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUpdateRequest(mux, decoder)
+		encodeResponse = EncodeUpdateResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "update")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "account")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountDeleteHandler configures the mux to serve the "account" service
 // "delete" endpoint.
 func MountDeleteHandler(mux goahttp.Muxer, h http.Handler) {
@@ -162,6 +284,108 @@ func NewDeleteHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "delete")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "account")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGroupAddHandler configures the mux to serve the "account" service
+// "groupAdd" endpoint.
+func MountGroupAddHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/account/{accountId}/group/{groupId}", f)
+}
+
+// NewGroupAddHandler creates a HTTP handler which loads the HTTP request and
+// calls the "account" service "groupAdd" endpoint.
+func NewGroupAddHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGroupAddRequest(mux, decoder)
+		encodeResponse = EncodeGroupAddResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "groupAdd")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "account")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGroupRemoveHandler configures the mux to serve the "account" service
+// "groupRemove" endpoint.
+func MountGroupRemoveHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/account/{accountId}/group/{groupId}", f)
+}
+
+// NewGroupRemoveHandler creates a HTTP handler which loads the HTTP request
+// and calls the "account" service "groupRemove" endpoint.
+func NewGroupRemoveHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGroupRemoveRequest(mux, decoder)
+		encodeResponse = EncodeGroupRemoveResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "groupRemove")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "account")
 		payload, err := decodeRequest(r)
 		if err != nil {

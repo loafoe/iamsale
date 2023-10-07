@@ -3,23 +3,76 @@
 // account HTTP client types
 //
 // Command:
-// $ goa gen github.com/loafoe/sailpoint/design
+// $ goa gen github.com/loafoe/iamsale/design
 
 package client
 
 import (
-	account "github.com/loafoe/sailpoint/gen/account"
+	account "github.com/loafoe/iamsale/gen/account"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // CreateRequestBody is the type of the "account" service "create" endpoint
 // HTTP request body.
 type CreateRequestBody struct {
 	// Name of user
+	Name string `form:"name" json:"name" xml:"name"`
+	// Login of user
+	Login string `form:"login" json:"login" xml:"login"`
+	// Email of user
+	Email string `form:"email" json:"email" xml:"email"`
+}
+
+// UpdateRequestBody is the type of the "account" service "update" endpoint
+// HTTP request body.
+type UpdateRequestBody struct {
+	// Status of user
+	Status string `form:"status" json:"status" xml:"status"`
+}
+
+// CreateResponseBody is the type of the "account" service "create" endpoint
+// HTTP response body.
+type CreateResponseBody struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Name of user
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// Login of user
 	Login *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
 	// Email of user
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Email *string `gorm:"index"`
+	// Status of account
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+}
+
+// GetResponseBody is the type of the "account" service "get" endpoint HTTP
+// response body.
+type GetResponseBody struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Name of user
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Login of user
+	Login *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
+	// Email of user
+	Email *string `gorm:"index"`
+	// Status of account
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+}
+
+// UpdateResponseBody is the type of the "account" service "update" endpoint
+// HTTP response body.
+type UpdateResponseBody struct {
+	// ID of account
+	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Name of user
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Login of user
+	Login *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
+	// Email of user
+	Email *string `gorm:"index"`
+	// Status of account
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }
 
 // NewCreateRequestBody builds the HTTP request body from the payload of the
@@ -31,4 +84,112 @@ func NewCreateRequestBody(p *account.CreatePayload) *CreateRequestBody {
 		Email: p.Account.Email,
 	}
 	return body
+}
+
+// NewUpdateRequestBody builds the HTTP request body from the payload of the
+// "update" endpoint of the "account" service.
+func NewUpdateRequestBody(p *account.UpdatePayload) *UpdateRequestBody {
+	body := &UpdateRequestBody{
+		Status: p.Account.Status,
+	}
+	return body
+}
+
+// NewCreateAccountCreated builds a "account" service "create" endpoint result
+// from a HTTP "Created" response.
+func NewCreateAccountCreated(body *CreateResponseBody) *account.Account {
+	v := &account.Account{
+		ID:     body.ID,
+		Name:   *body.Name,
+		Login:  *body.Login,
+		Email:  *body.Email,
+		Status: body.Status,
+	}
+
+	return v
+}
+
+// NewGetAccountOK builds a "account" service "get" endpoint result from a HTTP
+// "OK" response.
+func NewGetAccountOK(body *GetResponseBody) *account.Account {
+	v := &account.Account{
+		ID:     body.ID,
+		Name:   *body.Name,
+		Login:  *body.Login,
+		Email:  *body.Email,
+		Status: body.Status,
+	}
+
+	return v
+}
+
+// NewUpdateAccountOK builds a "account" service "update" endpoint result from
+// a HTTP "OK" response.
+func NewUpdateAccountOK(body *UpdateResponseBody) *account.Account {
+	v := &account.Account{
+		ID:     body.ID,
+		Name:   *body.Name,
+		Login:  *body.Login,
+		Email:  *body.Email,
+		Status: body.Status,
+	}
+
+	return v
+}
+
+// ValidateCreateResponseBody runs the validations defined on CreateResponseBody
+func ValidateCreateResponseBody(body *CreateResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Login == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("login", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Status != nil {
+		if !(*body.Status == "active" || *body.Status == "disabled") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled"}))
+		}
+	}
+	return
+}
+
+// ValidateGetResponseBody runs the validations defined on GetResponseBody
+func ValidateGetResponseBody(body *GetResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Login == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("login", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Status != nil {
+		if !(*body.Status == "active" || *body.Status == "disabled") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled"}))
+		}
+	}
+	return
+}
+
+// ValidateUpdateResponseBody runs the validations defined on UpdateResponseBody
+func ValidateUpdateResponseBody(body *UpdateResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Login == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("login", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Status != nil {
+		if !(*body.Status == "active" || *body.Status == "disabled") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled"}))
+		}
+	}
+	return
 }
