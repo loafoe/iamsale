@@ -18,15 +18,20 @@ goa gen github.com/loafoe/iamsale/design
 
 ### Configuration
 
-| Environment                   | Description                      | Default       |
-|-------------------------------|----------------------------------|---------------|
-| `IAMSALE_REGION`              | The IAM region                   | `us-east`     |
-| `IAMSALE_ENV`                 | The IAM environment              | `client-test` |
-| `IAMSALE_SERVICE_ID`          | The Service ID                   |               |
-| `IAMSALE_SERVICE_PRIVATE_KEY` | The Service Private Key          |               |
-| `IAMSALE_ORG_ID`              | The IAM Organization ID to use   |               |
-| `IAMSALE_USERNAME`            | The username to use for API auth |               |
-| `IAMSALE_PASSWORD`            | The password to use for API auth |               |
+The application reads it config from `iamsale.yaml`
+
+```yaml
+iam:
+  region: us-east
+  environment: client-test
+  serviceId: "some.app.prosition@someorg.philips-healthsuite.com"
+  servicePrivateKey: "-----BEGIN RSA PRIVATE KEY-----XXXREMOVEDXXX-----END RSA PRIVATE KEY-----"
+  orgId: "460631dc-2ddd-4c38-a18d-7abe72ecb4c9"
+
+api:
+  username: "iamsale-client"
+  password: "S0meSecr3tH3r3"
+```
 
 ## License
 
