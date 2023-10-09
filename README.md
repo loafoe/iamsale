@@ -16,9 +16,17 @@ go install goa.design/goa/v3/cmd/goa@v3
 goa gen github.com/loafoe/iamsale/design
 ```
 
-### Implement
+### Configuration
 
-You are now ready to implement the services
+| Environment                   | Description                      | Default       |
+|-------------------------------|----------------------------------|---------------|
+| `IAMSALE_REGION`              | The IAM region                   | `us-east`     |
+| `IAMSALE_ENV`                 | The IAM environment              | `client-test` |
+| `IAMSALE_SERVICE_ID`          | The Service ID                   |               |
+| `IAMSALE_SERVICE_PRIVATE_KEY` | The Service Private Key          |               |
+| `IAMSALE_ORG_ID`              | The IAM Organization ID to use   |               |
+| `IAMSALE_USERNAME`            | The username to use for API auth |               |
+| `IAMSALE_PASSWORD`            | The password to use for API auth |               |
 
 ## License
 
