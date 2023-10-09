@@ -210,7 +210,7 @@ func unmarshalAccountResponseToAggregateAccount(v *AccountResponse) *aggregate.A
 func unmarshalGroupResponseToAggregateGroup(v *GroupResponse) *aggregate.Group {
 	res := &aggregate.Group{
 		Name: v.Name,
-		GUID: v.GUID,
+		ID:   v.ID,
 	}
 
 	return res

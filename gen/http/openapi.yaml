@@ -538,16 +538,16 @@ definitions:
         title: groupResponse
         type: object
         properties:
-            guid:
+            id:
                 type: string
-                description: GUID of group
+                description: ID of group
                 example: ac32dcb3-3a58-4bfc-b801-6609681ec712
             name:
                 type: string
                 description: Name of group
                 example: GROUPNAME
         example:
-            guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+            id: ac32dcb3-3a58-4bfc-b801-6609681ec712
             name: GROUPNAME
 securityDefinitions:
     BasicAuth_header_Authorization:

@@ -74,8 +74,8 @@ type AccountResponse struct {
 type GroupResponse struct {
 	// Name of group
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// GUID of group
-	GUID *string `form:"guid,omitempty" json:"guid,omitempty" xml:"guid,omitempty"`
+	// ID of group
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 }
 
 // NewAccountsAccountOK builds a "aggregate" service "accounts" endpoint result

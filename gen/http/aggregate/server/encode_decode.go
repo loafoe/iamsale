@@ -150,7 +150,7 @@ func marshalAggregateAccountToAccountResponse(v *aggregate.Account) *AccountResp
 func marshalAggregateGroupToGroupResponse(v *aggregate.Group) *GroupResponse {
 	res := &GroupResponse{
 		Name: v.Name,
-		GUID: v.GUID,
+		ID:   v.ID,
 	}
 
 	return res

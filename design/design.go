@@ -79,7 +79,7 @@ var Group = Type("group", func() {
 	Attribute("name", String, "Name of group", func() {
 		Example("GROUPNAME")
 	})
-	Attribute("guid", String, "GUID of group", func() {
+	Attribute("id", String, "ID of group", func() {
 		Example("example 1", "6dfb5ec6-0c8e-4efa-ae7d-9eca77b73d2b")
 		Example("another 2", "ac32dcb3-3a58-4bfc-b801-6609681ec712")
 	})

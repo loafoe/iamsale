@@ -60,8 +60,8 @@ type AccountsPayload struct {
 type Group struct {
 	// Name of group
 	Name *string
-	// GUID of group
-	GUID *string
+	// ID of group
+	ID *string
 }
 
 // GroupsPayload is the payload type of the aggregate service groups method.

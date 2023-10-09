@@ -274,18 +274,18 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/Group'
                                 example:
-                                    - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                                    - id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                       name: GROUPNAME
-                                    - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                                    - id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                       name: GROUPNAME
-                                    - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                                    - id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                       name: GROUPNAME
                             example:
-                                - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                                - id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                   name: GROUPNAME
-                                - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                                - id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                   name: GROUPNAME
-                                - guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                                - id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                                   name: GROUPNAME
                 "403":
                     description: 'PermissionDenied: Forbidden response.'
@@ -409,16 +409,16 @@ components:
         Group:
             type: object
             properties:
-                guid:
+                id:
                     type: string
-                    description: GUID of group
+                    description: ID of group
                     example: ac32dcb3-3a58-4bfc-b801-6609681ec712
                 name:
                     type: string
                     description: Name of group
                     example: GROUPNAME
             example:
-                guid: ac32dcb3-3a58-4bfc-b801-6609681ec712
+                id: ac32dcb3-3a58-4bfc-b801-6609681ec712
                 name: GROUPNAME
         UpdateAccount:
             type: object
