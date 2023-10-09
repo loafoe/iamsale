@@ -33,7 +33,7 @@ func main() {
 	ts.Mount(mux, testServer)
 
 	httpsvr := &http.Server{
-		Addr:    "localhost:8081",
+		Addr:    "localhost:8088",
 		Handler: mux,
 	}
 	if err := httpsvr.ListenAndServe(); err != nil {
