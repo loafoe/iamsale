@@ -196,6 +196,7 @@ func DecodeGroupsResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 func unmarshalAccountResponseToAggregateAccount(v *AccountResponse) *aggregate.Account {
 	res := &aggregate.Account{
 		ID:     v.ID,
+		GUID:   v.GUID,
 		Name:   *v.Name,
 		Login:  *v.Login,
 		Email:  *v.Email,

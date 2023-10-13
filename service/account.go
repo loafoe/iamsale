@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/loafoe/iamsale/gen/account"
+	"github.com/loafoe/iamsale/storage"
 	"github.com/philips-software/go-hsdp-api/iam"
 	"goa.design/goa/v3/security"
 	"strings"
@@ -13,12 +14,14 @@ type Account struct {
 	AuthConfig
 	IAMConfig
 	client *iam.Client
+	db     storage.Store
 }
 
-func NewAccount(authConfig AuthConfig, iamConfig IAMConfig) (*Account, error) {
+func NewAccount(authConfig AuthConfig, iamConfig IAMConfig, db storage.Store) (*Account, error) {
 	a := &Account{
 		AuthConfig: authConfig,
 		IAMConfig:  iamConfig,
+		db:         db,
 	}
 	var err error
 	a.client, err = iam.NewClient(nil, &iam.Config{
@@ -46,35 +49,61 @@ func (a *Account) BasicAuth(ctx context.Context, user, pass string, schema *secu
 }
 
 func (a *Account) Create(ctx context.Context, payload *account.CreatePayload) (res *account.Account, err error) {
-	//TODO implement me
-	id := "ec3f34c7-5142-46c3-adff-b4d3c47ec8b7"
-	return &account.Account{
-		ID:    &id,
-		Name:  payload.Account.Name,
-		Login: payload.Account.Login,
-		Email: payload.Account.Email,
-	}, nil
+	// Check if user already exists
+	list, _, err := a.client.Users.GetAllUsers(&iam.GetUserOptions{
+		LoginID: &payload.Account.Login,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("user exist check: %w", err)
+	}
+
+	status := "pending"
+
+	acc := account.Account{
+		Name:   payload.Account.Name,
+		Login:  payload.Account.Login,
+		Email:  payload.Account.Email,
+		Status: &status,
+	}
+	if len(list) > 0 {
+		acc.GUID = &list[0]
+		status = "active"
+	}
+	created, err := a.db.Add(acc)
+	if err != nil {
+		return nil, fmt.Errorf("create account: %w", err)
+	}
+	return created, nil
 }
 
 func (a *Account) Get(ctx context.Context, payload *account.GetPayload) (res *account.Account, err error) {
-	return &account.Account{
-		ID:    &payload.AccountID,
-		Login: "amos",
-		Email: "amos@hostedzonehere.com",
-		Name:  "Amos Burton",
-	}, nil
+	found, err := a.db.FindByGUID(payload.AccountID)
+	if err != nil {
+		return nil, fmt.Errorf("get account: %w", err)
+	}
+	return found, nil
 }
 
 func (a *Account) Update(ctx context.Context, payload *account.UpdatePayload) (res *account.Account, err error) {
-	return &account.Account{
-		ID:    &payload.AccountID,
-		Login: "amos",
-		Email: "amos@hostedzonehere.com",
-		Name:  "Amos Burton",
-	}, nil
+	found, err := a.db.FindByGUID(payload.AccountID)
+	if err != nil {
+		return nil, fmt.Errorf("get before update account: %w", err)
+	}
+	found.Status = &payload.Account.Status
+	updated, err := a.db.Update(*found)
+	if err != nil {
+		return nil, fmt.Errorf("update account: %w", err)
+	}
+	return updated, nil
 }
 
 func (a *Account) Delete(ctx context.Context, payload *account.DeletePayload) (err error) {
+	err = a.db.Remove(account.Account{
+		GUID: &payload.AccountID,
+	})
+	if err != nil {
+		return fmt.Errorf("delete account: %w", err)
+	}
 	return nil
 }
 

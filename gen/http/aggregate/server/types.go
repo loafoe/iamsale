@@ -58,14 +58,16 @@ type GroupsPermissionDeniedResponseBody struct {
 
 // AccountResponse is used to define fields on response body types.
 type AccountResponse struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name string `form:"name" json:"name" xml:"name"`
 	// Login of user
-	Login string `form:"login" json:"login" xml:"login"`
+	Login string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email string `gorm:"index"`
+	Email string `form:"email" json:"email" xml:"email"`
 	// Status of account
 	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/loafoe/iamsale/gen/aggregate"
+	"github.com/loafoe/iamsale/storage"
 	"github.com/philips-software/go-hsdp-api/iam"
 	"goa.design/goa/v3/security"
 	"strings"
@@ -13,12 +14,14 @@ type Aggregate struct {
 	AuthConfig
 	IAMConfig
 	client *iam.Client
+	db     storage.Store
 }
 
-func NewAggregate(authConfig AuthConfig, iamConfig IAMConfig) (*Aggregate, error) {
+func NewAggregate(authConfig AuthConfig, iamConfig IAMConfig, db storage.Store) (*Aggregate, error) {
 	s := &Aggregate{
 		AuthConfig: authConfig,
 		IAMConfig:  iamConfig,
+		db:         db,
 	}
 	var err error
 	s.client, err = iam.NewClient(nil, &iam.Config{
@@ -46,24 +49,13 @@ func (a *Aggregate) BasicAuth(ctx context.Context, user, pass string, schema *se
 }
 
 func (a *Aggregate) Accounts(ctx context.Context, payload *aggregate.AccountsPayload) (res []*aggregate.Account, err error) {
-	users, _, err := a.client.Users.GetAllUsers(&iam.GetUserOptions{
-		OrganizationID: &a.OrgID,
-	})
+	accounts, err := a.db.FindAll()
 	if err != nil {
-		return res, fmt.Errorf("get users: %w", err)
+		return res, err
 	}
-	for _, u := range users {
-		id := u
-		foundUser, _, err := a.client.Users.GetUserByID(id)
-		if err != nil {
-			return res, fmt.Errorf("get user %s: %w", id, err)
-		}
-		res = append(res, &aggregate.Account{
-			Name:  fmt.Sprintf("%s %s", foundUser.Name.Given, foundUser.Name.Family),
-			Login: foundUser.LoginID,
-			Email: foundUser.EmailAddress,
-			ID:    &id,
-		})
+	for _, a := range accounts {
+		t := aggregate.Account(*a)
+		res = append(res, &t)
 	}
 	return
 }

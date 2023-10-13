@@ -56,6 +56,9 @@ func (c *Client) Get(ctx context.Context, p *GetPayload) (res *Account, err erro
 }
 
 // Update calls the "update" endpoint of the "account" service.
+// Update may return the following errors:
+//   - "NotImplemented" (type *goa.ServiceError)
+//   - error: internal error
 func (c *Client) Update(ctx context.Context, p *UpdatePayload) (res *Account, err error) {
 	var ires any
 	ires, err = c.UpdateEndpoint(ctx, p)

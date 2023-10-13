@@ -32,10 +32,11 @@ paths:
                                 $ref: '#/components/schemas/Account'
                             example:
                                 email: amos@hostedzonehere.com
-                                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                guid: Dolores et aut est quaerat est.
+                                id: 3292476383118192328
                                 login: amos
                                 name: Amos Burton
-                                status: active
+                                status: disabled
             security:
                 - BasicAuth_header_Authorization: []
     /account/{accountId}:
@@ -85,10 +86,11 @@ paths:
                                 $ref: '#/components/schemas/Account'
                             example:
                                 email: amos@hostedzonehere.com
-                                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                guid: Ad et autem autem.
+                                id: 6425641389400728460
                                 login: amos
                                 name: Amos Burton
-                                status: disabled
+                                status: pending
             security:
                 - BasicAuth_header_Authorization: []
         put:
@@ -114,7 +116,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateAccount'
                         example:
-                            status: active
+                            status: disabled
             responses:
                 "200":
                     description: OK response.
@@ -124,10 +126,17 @@ paths:
                                 $ref: '#/components/schemas/Account'
                             example:
                                 email: amos@hostedzonehere.com
-                                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                guid: Vitae mollitia.
+                                id: 2143492392428240519
                                 login: amos
                                 name: Amos Burton
                                 status: disabled
+                "501":
+                    description: 'NotImplemented: Not Implemented response.'
+                    content:
+                        application/vnd.goa.error:
+                            schema:
+                                $ref: '#/components/schemas/Error'
             security:
                 - BasicAuth_header_Authorization: []
     /account/{accountId}/group/{groupId}:
@@ -209,43 +218,51 @@ paths:
                                     $ref: '#/components/schemas/Account'
                                 example:
                                     - email: amos@hostedzonehere.com
-                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                      guid: Aut ut.
+                                      id: 170531420334966230
                                       login: amos
                                       name: Amos Burton
                                       status: disabled
                                     - email: amos@hostedzonehere.com
-                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                      guid: Aut ut.
+                                      id: 170531420334966230
                                       login: amos
                                       name: Amos Burton
                                       status: disabled
                                     - email: amos@hostedzonehere.com
-                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                      guid: Aut ut.
+                                      id: 170531420334966230
                                       login: amos
                                       name: Amos Burton
                                       status: disabled
                                     - email: amos@hostedzonehere.com
-                                      id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                      guid: Aut ut.
+                                      id: 170531420334966230
                                       login: amos
                                       name: Amos Burton
                                       status: disabled
                             example:
                                 - email: amos@hostedzonehere.com
-                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                  guid: Aut ut.
+                                  id: 170531420334966230
                                   login: amos
                                   name: Amos Burton
                                   status: disabled
                                 - email: amos@hostedzonehere.com
-                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                  guid: Aut ut.
+                                  id: 170531420334966230
                                   login: amos
                                   name: Amos Burton
                                   status: disabled
                                 - email: amos@hostedzonehere.com
-                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                  guid: Aut ut.
+                                  id: 170531420334966230
                                   login: amos
                                   name: Amos Burton
                                   status: disabled
                                 - email: amos@hostedzonehere.com
-                                  id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                                  guid: Aut ut.
+                                  id: 170531420334966230
                                   login: amos
                                   name: Amos Burton
                                   status: disabled
@@ -313,10 +330,15 @@ components:
                     type: string
                     description: Email of user
                     example: amos@hostedzonehere.com
-                id:
+                guid:
                     type: string
-                    description: ID of account
-                    example: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                    description: IDP account identifier
+                    example: Autem non qui omnis omnis quis qui.
+                id:
+                    type: integer
+                    description: Temporary account identifier
+                    example: 2564889465972314427
+                    format: int64
                 login:
                     type: string
                     description: Login of user
@@ -328,16 +350,18 @@ components:
                 status:
                     type: string
                     description: Status of account
-                    example: disabled
+                    example: active
                     enum:
                         - active
                         - disabled
+                        - pending
             example:
                 email: amos@hostedzonehere.com
-                id: ec3f34c7-5142-46c3-adff-b4d3c47ec8b7
+                guid: Non ipsum.
+                id: 5282549402387944190
                 login: amos
                 name: Amos Burton
-                status: disabled
+                status: pending
             required:
                 - name
                 - login
@@ -398,7 +422,7 @@ components:
                 message: parameter 'p' must be an integer
                 name: bad_request
                 temporary: false
-                timeout: false
+                timeout: true
             required:
                 - name
                 - id
@@ -426,12 +450,13 @@ components:
                 status:
                     type: string
                     description: Status of user
-                    example: disabled
+                    example: active
                     enum:
                         - active
                         - disabled
+                        - pending
             example:
-                status: disabled
+                status: active
             required:
                 - status
     securitySchemes:

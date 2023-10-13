@@ -48,29 +48,32 @@ var CreateAccount = Type("CreateAccount", func() {
 
 var UpdateAccount = Type("UpdateAccount", func() {
 	Attribute("status", String, "Status of user", func() {
-		Enum("active", "disabled")
+		Enum("active", "disabled", "pending")
 	})
 	Required("status")
 })
 
 var Account = Type("Account", func() {
-	Attribute("id", String, "ID of account", func() {
-		Example("ec3f34c7-5142-46c3-adff-b4d3c47ec8b7")
+	Attribute("id", Int64, "Temporary account identifier", func() {
 		Meta("struct:tag:json", "id,omitempty")
-		Meta("struct:tag:gorm", "primaryKey")
+		Meta("struct:tag:gorm", "autoIncrement")
+	})
+	Attribute("guid", String, "IDP account identifier", func() {
+		Meta("struct:tag:json", "guid,omitempty")
 	})
 	Attribute("name", String, "Name of user", func() {
 		Example("Amos Burton")
 	})
 	Attribute("login", String, "Login of user", func() {
 		Example("amos")
+		Meta("struct:tag:json", "login")
+		Meta("struct:tag:gorm", "uniqueIndex")
 	})
 	Attribute("email", String, "Email of user", func() {
 		Example("amos@hostedzonehere.com")
-		Meta("struct:tag:gorm", "index")
 	})
 	Attribute("status", String, "Status of account", func() {
-		Enum("active", "disabled")
+		Enum("active", "disabled", "pending")
 	})
 	Required("name", "login", "email")
 })
@@ -183,10 +186,12 @@ var _ = Service("account", func() {
 			Field(4, "account", UpdateAccount)
 			Required("username", "password", "accountId", "account")
 		})
+		Error("NotImplemented")
 		Result(Account)
 		HTTP(func() {
 			PUT("/account/{accountId}")
 			Body("account")
+			Response("NotImplemented", StatusNotImplemented)
 			Response(StatusOK)
 		})
 	})

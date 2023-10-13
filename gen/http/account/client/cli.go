@@ -79,10 +79,10 @@ func BuildUpdatePayload(accountUpdateBody string, accountUpdateAccountID string,
 	{
 		err = json.Unmarshal([]byte(accountUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"status\": \"active\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"status\": \"disabled\"\n   }'")
 		}
-		if !(body.Status == "active" || body.Status == "disabled") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", body.Status, []any{"active", "disabled"}))
+		if !(body.Status == "active" || body.Status == "disabled" || body.Status == "pending") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", body.Status, []any{"active", "disabled", "pending"}))
 		}
 		if err != nil {
 			return nil, err

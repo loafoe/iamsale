@@ -39,14 +39,16 @@ const ServiceName = "aggregate"
 var MethodNames = [2]string{"accounts", "groups"}
 
 type Account struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name string
 	// Login of user
-	Login string
+	Login string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email string `gorm:"index"`
+	Email string
 	// Status of account
 	Status *string
 }

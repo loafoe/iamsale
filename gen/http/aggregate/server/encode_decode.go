@@ -136,6 +136,7 @@ func EncodeGroupsError(encoder func(context.Context, http.ResponseWriter) goahtt
 func marshalAggregateAccountToAccountResponse(v *aggregate.Account) *AccountResponse {
 	res := &AccountResponse{
 		ID:     v.ID,
+		GUID:   v.GUID,
 		Name:   v.Name,
 		Login:  v.Login,
 		Email:  v.Email,

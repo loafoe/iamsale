@@ -33,14 +33,16 @@ type UpdateRequestBody struct {
 // CreateResponseBody is the type of the "account" service "create" endpoint
 // HTTP response body.
 type CreateResponseBody struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name string `form:"name" json:"name" xml:"name"`
 	// Login of user
-	Login string `form:"login" json:"login" xml:"login"`
+	Login string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email string `gorm:"index"`
+	Email string `form:"email" json:"email" xml:"email"`
 	// Status of account
 	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }
@@ -48,14 +50,16 @@ type CreateResponseBody struct {
 // GetResponseBody is the type of the "account" service "get" endpoint HTTP
 // response body.
 type GetResponseBody struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name string `form:"name" json:"name" xml:"name"`
 	// Login of user
-	Login string `form:"login" json:"login" xml:"login"`
+	Login string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email string `gorm:"index"`
+	Email string `form:"email" json:"email" xml:"email"`
 	// Status of account
 	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }
@@ -63,16 +67,36 @@ type GetResponseBody struct {
 // UpdateResponseBody is the type of the "account" service "update" endpoint
 // HTTP response body.
 type UpdateResponseBody struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name string `form:"name" json:"name" xml:"name"`
 	// Login of user
-	Login string `form:"login" json:"login" xml:"login"`
+	Login string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email string `gorm:"index"`
+	Email string `form:"email" json:"email" xml:"email"`
 	// Status of account
 	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
+}
+
+// UpdateNotImplementedResponseBody is the type of the "account" service
+// "update" endpoint HTTP response body for the "NotImplemented" error.
+type UpdateNotImplementedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
 // NewCreateResponseBody builds the HTTP response body from the result of the
@@ -80,6 +104,7 @@ type UpdateResponseBody struct {
 func NewCreateResponseBody(res *account.Account) *CreateResponseBody {
 	body := &CreateResponseBody{
 		ID:     res.ID,
+		GUID:   res.GUID,
 		Name:   res.Name,
 		Login:  res.Login,
 		Email:  res.Email,
@@ -93,6 +118,7 @@ func NewCreateResponseBody(res *account.Account) *CreateResponseBody {
 func NewGetResponseBody(res *account.Account) *GetResponseBody {
 	body := &GetResponseBody{
 		ID:     res.ID,
+		GUID:   res.GUID,
 		Name:   res.Name,
 		Login:  res.Login,
 		Email:  res.Email,
@@ -106,10 +132,25 @@ func NewGetResponseBody(res *account.Account) *GetResponseBody {
 func NewUpdateResponseBody(res *account.Account) *UpdateResponseBody {
 	body := &UpdateResponseBody{
 		ID:     res.ID,
+		GUID:   res.GUID,
 		Name:   res.Name,
 		Login:  res.Login,
 		Email:  res.Email,
 		Status: res.Status,
+	}
+	return body
+}
+
+// NewUpdateNotImplementedResponseBody builds the HTTP response body from the
+// result of the "update" endpoint of the "account" service.
+func NewUpdateNotImplementedResponseBody(res *goa.ServiceError) *UpdateNotImplementedResponseBody {
+	body := &UpdateNotImplementedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
 	}
 	return body
 }
@@ -195,8 +236,8 @@ func ValidateUpdateRequestBody(body *UpdateRequestBody) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("status", "body"))
 	}
 	if body.Status != nil {
-		if !(*body.Status == "active" || *body.Status == "disabled") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled"}))
+		if !(*body.Status == "active" || *body.Status == "disabled" || *body.Status == "pending") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled", "pending"}))
 		}
 	}
 	return

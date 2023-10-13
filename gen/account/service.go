@@ -10,6 +10,7 @@ package account
 import (
 	"context"
 
+	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
 
@@ -49,14 +50,16 @@ var MethodNames = [6]string{"create", "get", "update", "delete", "groupAdd", "gr
 
 // Account is the result type of the account service create method.
 type Account struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name string
 	// Login of user
-	Login string
+	Login string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email string `gorm:"index"`
+	Email string
 	// Status of account
 	Status *string
 }
@@ -130,4 +133,9 @@ type UpdatePayload struct {
 	// Account ID
 	AccountID string
 	Account   *UpdateAccount
+}
+
+// MakeNotImplemented builds a goa.ServiceError from an error.
+func MakeNotImplemented(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "NotImplemented", false, false, false)
 }

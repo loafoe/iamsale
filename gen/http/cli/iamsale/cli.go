@@ -33,12 +33,12 @@ account (create|get|update|delete|group-add|group-remove)
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` test test` + "\n" +
-		os.Args[0] + ` aggregate accounts --username "Aut similique soluta vel natus corrupti." --password "Velit quia."` + "\n" +
+		os.Args[0] + ` aggregate accounts --username "Minima et veniam voluptates quaerat minima sunt." --password "Consequuntur impedit necessitatibus neque nesciunt maxime."` + "\n" +
 		os.Args[0] + ` account create --body '{
       "email": "amos@hostedzonehere.com",
       "login": "amos",
       "name": "Amos Burton"
-   }' --username "Aut et." --password "Amet est iusto perferendis nihil quam voluptas."` + "\n" +
+   }' --username "Vitae ut modi placeat ut quisquam." --password "Dolores ut doloremque ullam omnis amet."` + "\n" +
 		""
 }
 
@@ -305,7 +305,7 @@ Account aggregation. Returns all known accounts
     -password STRING: 
 
 Example:
-    %[1]s aggregate accounts --username "Aut similique soluta vel natus corrupti." --password "Velit quia."
+    %[1]s aggregate accounts --username "Minima et veniam voluptates quaerat minima sunt." --password "Consequuntur impedit necessitatibus neque nesciunt maxime."
 `, os.Args[0])
 }
 
@@ -317,7 +317,7 @@ Group aggregation. Returns list of all known groups
     -password STRING: 
 
 Example:
-    %[1]s aggregate groups --username "Consequuntur impedit necessitatibus neque nesciunt maxime." --password "Corporis aut."
+    %[1]s aggregate groups --username "Iusto perferendis nihil quam voluptas." --password "Tenetur eaque veritatis."
 `, os.Args[0])
 }
 
@@ -352,7 +352,7 @@ Example:
       "email": "amos@hostedzonehere.com",
       "login": "amos",
       "name": "Amos Burton"
-   }' --username "Aut et." --password "Amet est iusto perferendis nihil quam voluptas."
+   }' --username "Vitae ut modi placeat ut quisquam." --password "Dolores ut doloremque ullam omnis amet."
 `, os.Args[0])
 }
 
@@ -365,7 +365,7 @@ Get account details
     -password STRING: Password
 
 Example:
-    %[1]s account get --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Eaque veritatis." --password "Et laudantium velit quia culpa facere vitae."
+    %[1]s account get --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Rem velit." --password "Illo accusamus."
 `, os.Args[0])
 }
 
@@ -380,8 +380,8 @@ Update account details
 
 Example:
     %[1]s account update --body '{
-      "status": "active"
-   }' --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Ut quisquam exercitationem dolores ut." --password "Ullam omnis amet enim nemo dolores."
+      "status": "disabled"
+   }' --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Earum voluptatem dolorem dolore deserunt aut." --password "Temporibus et tempora et."
 `, os.Args[0])
 }
 
@@ -394,7 +394,7 @@ Delete an account
     -password STRING: 
 
 Example:
-    %[1]s account delete --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Est quaerat est dolor." --password "Rem velit."
+    %[1]s account delete --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --username "Nostrum placeat est reiciendis." --password "Ea dolor est autem."
 `, os.Args[0])
 }
 
@@ -408,7 +408,7 @@ Add an account to a group
     -password STRING: 
 
 Example:
-    %[1]s account group-add --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --group-id "4085f7a1-6956-4003-8a89-68931f31ab12" --username "Illo accusamus." --password "Quam ad et autem."
+    %[1]s account group-add --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --group-id "4085f7a1-6956-4003-8a89-68931f31ab12" --username "Doloribus aut et facere unde." --password "Impedit deserunt voluptas."
 `, os.Args[0])
 }
 
@@ -422,6 +422,6 @@ Remove an account from a group
     -password STRING: 
 
 Example:
-    %[1]s account group-remove --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --group-id "4085f7a1-6956-4003-8a89-68931f31ab12" --username "Dicta ratione dolorem earum voluptatem dolorem dolore." --password "Aut totam temporibus et tempora."
+    %[1]s account group-remove --account-id "18ee082f-1d61-40d3-b8a2-f4eee67cefff" --group-id "4085f7a1-6956-4003-8a89-68931f31ab12" --username "Doloribus dolore magni nihil rem repellendus qui." --password "Culpa quae vitae delectus eligendi suscipit voluptates."
 `, os.Args[0])
 }

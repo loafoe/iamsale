@@ -213,6 +213,9 @@ func EncodeUpdateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // DecodeUpdateResponse returns a decoder for responses returned by the account
 // update endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeUpdateResponse may return the following errors:
+//   - "NotImplemented" (type *goa.ServiceError): http.StatusNotImplemented
+//   - error: internal error
 func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
 	return func(resp *http.Response) (any, error) {
 		if restoreBody {
@@ -243,6 +246,20 @@ func DecodeUpdateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			}
 			res := NewUpdateAccountOK(&body)
 			return res, nil
+		case http.StatusNotImplemented:
+			var (
+				body UpdateNotImplementedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("account", "update", err)
+			}
+			err = ValidateUpdateNotImplementedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("account", "update", err)
+			}
+			return nil, NewUpdateNotImplemented(&body)
 		default:
 			body, _ := io.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("account", "update", resp.StatusCode, string(body))

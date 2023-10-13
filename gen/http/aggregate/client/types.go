@@ -58,14 +58,16 @@ type GroupsPermissionDeniedResponseBody struct {
 
 // AccountResponse is used to define fields on response body types.
 type AccountResponse struct {
-	// ID of account
-	ID *string `gorm:"primaryKey" json:"id,omitempty"`
+	// Temporary account identifier
+	ID *int64 `gorm:"autoIncrement" json:"id,omitempty"`
+	// IDP account identifier
+	GUID *string `json:"guid,omitempty"`
 	// Name of user
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// Login of user
-	Login *string `form:"login,omitempty" json:"login,omitempty" xml:"login,omitempty"`
+	Login *string `gorm:"uniqueIndex" json:"login"`
 	// Email of user
-	Email *string `gorm:"index"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	// Status of account
 	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status,omitempty"`
 }
@@ -190,8 +192,8 @@ func ValidateAccountResponse(body *AccountResponse) (err error) {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
 	if body.Status != nil {
-		if !(*body.Status == "active" || *body.Status == "disabled") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled"}))
+		if !(*body.Status == "active" || *body.Status == "disabled" || *body.Status == "pending") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.status", *body.Status, []any{"active", "disabled", "pending"}))
 		}
 	}
 	return
