@@ -33,7 +33,7 @@ func NewAccount(authConfig AuthConfig, iamConfig IAMConfig, db storage.Store) (*
 	}
 	err = a.client.ServiceLogin(iam.Service{
 		ServiceID:  a.ServiceID,
-		PrivateKey: a.ServicePrivateKey,
+		PrivateKey: SecretFromEnv(a.ServicePrivateKey),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("service login: %w", err)
@@ -42,7 +42,7 @@ func NewAccount(authConfig AuthConfig, iamConfig IAMConfig, db storage.Store) (*
 }
 
 func (a *Account) BasicAuth(ctx context.Context, user, pass string, schema *security.BasicScheme) (context.Context, error) {
-	if !strings.EqualFold(a.Username, user) || !strings.EqualFold(a.Password, pass) {
+	if !strings.EqualFold(a.Username, user) || !strings.EqualFold(SecretFromEnv(a.Password), pass) {
 		return ctx, fmt.Errorf("invalid username or password")
 	}
 	return ctx, nil

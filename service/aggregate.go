@@ -33,7 +33,7 @@ func NewAggregate(authConfig AuthConfig, iamConfig IAMConfig, db storage.Store) 
 	}
 	err = s.client.ServiceLogin(iam.Service{
 		ServiceID:  s.ServiceID,
-		PrivateKey: s.ServicePrivateKey,
+		PrivateKey: SecretFromEnv(s.ServicePrivateKey),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("service login: %w", err)
@@ -42,7 +42,7 @@ func NewAggregate(authConfig AuthConfig, iamConfig IAMConfig, db storage.Store) 
 }
 
 func (a *Aggregate) BasicAuth(ctx context.Context, user, pass string, schema *security.BasicScheme) (context.Context, error) {
-	if !strings.EqualFold(a.Username, user) || !strings.EqualFold(a.Password, pass) {
+	if !strings.EqualFold(a.Username, user) || !strings.EqualFold(SecretFromEnv(a.Password), pass) {
 		return ctx, fmt.Errorf("invalid username or password")
 	}
 	return ctx, nil
