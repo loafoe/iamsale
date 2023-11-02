@@ -25,12 +25,12 @@ iam:
   region: us-east
   environment: client-test
   serviceId: "some.app.prosition@someorg.philips-healthsuite.com"
-  servicePrivateKey: "-----BEGIN RSA PRIVATE KEY-----XXXREMOVEDXXX-----END RSA PRIVATE KEY-----"
+  servicePrivateKey: $KEY_FROM_ENV
   orgId: "460631dc-2ddd-4c38-a18d-7abe72ecb4c9"
 
 api:
   username: "iamsale-client"
-  password: "S0meSecr3tH3r3"
+  password: $PWD_FROM_ENV
 ```
 
 ## License
