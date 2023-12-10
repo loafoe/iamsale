@@ -5,7 +5,7 @@ go 1.21.0
 require (
 	github.com/glebarez/sqlite v1.10.0
 	github.com/magiconair/properties v1.8.7
-	github.com/philips-software/go-hsdp-api v0.83.2
+	github.com/philips-software/go-hsdp-api v0.83.3
 	github.com/spf13/viper v1.18.1
 	goa.design/goa/v3 v3.13.2
 	gorm.io/gorm v1.25.5
@@ -22,7 +22,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.15.4 // indirect
+	github.com/go-playground/validator/v10 v10.16.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.4.0 // indirect
