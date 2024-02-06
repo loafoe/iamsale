@@ -6,7 +6,7 @@ require (
 	github.com/glebarez/sqlite v1.10.0
 	github.com/magiconair/properties v1.8.7
 	github.com/philips-software/go-hsdp-api v0.83.3
-	github.com/spf13/viper v1.18.1
+	github.com/spf13/viper v1.18.2
 	goa.design/goa/v3 v3.14.1
 	gorm.io/gorm v1.25.7
 )
