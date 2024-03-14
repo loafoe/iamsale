@@ -3,7 +3,7 @@ module github.com/loafoe/iamsale
 go 1.21.0
 
 require (
-	github.com/glebarez/sqlite v1.10.0
+	github.com/glebarez/sqlite v1.11.0
 	github.com/magiconair/properties v1.8.7
 	github.com/philips-software/go-hsdp-api v0.84.0
 	github.com/spf13/viper v1.18.2
