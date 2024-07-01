@@ -5,7 +5,7 @@ go 1.21.0
 require (
 	github.com/glebarez/sqlite v1.10.0
 	github.com/magiconair/properties v1.8.7
-	github.com/philips-software/go-hsdp-api v0.84.0
+	github.com/philips-software/go-hsdp-api v0.85.0
 	github.com/spf13/viper v1.18.2
 	goa.design/goa/v3 v3.16.2
 	gorm.io/gorm v1.25.7
@@ -34,7 +34,7 @@ require (
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
-	github.com/philips-software/go-hsdp-signer v1.4.0 // indirect
+	github.com/philips-software/go-nih-signer v1.5.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
