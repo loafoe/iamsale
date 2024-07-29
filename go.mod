@@ -6,7 +6,7 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/magiconair/properties v1.8.7
 	github.com/philips-software/go-hsdp-api v0.85.0
-	github.com/spf13/viper v1.18.2
+	github.com/spf13/viper v1.19.0
 	goa.design/goa/v3 v3.18.0
 	gorm.io/gorm v1.25.10
 )
@@ -34,7 +34,7 @@ require (
 	github.com/manveru/faker v0.0.0-20171103152722-9fbc68a78c4d // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/philips-software/go-nih-signer v1.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
