@@ -8,7 +8,7 @@ require (
 	github.com/philips-software/go-hsdp-api v0.85.0
 	github.com/spf13/viper v1.19.0
 	goa.design/goa/v3 v3.18.0
-	gorm.io/gorm v1.25.11
+	gorm.io/gorm v1.25.12
 )
 
 require (
