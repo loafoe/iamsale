@@ -6,7 +6,7 @@ toolchain go1.23.2
 
 require (
 	github.com/glebarez/sqlite v1.11.0
-	github.com/magiconair/properties v1.8.7
+	github.com/magiconair/properties v1.8.9
 	github.com/philips-software/go-hsdp-api v0.87.0
 	github.com/spf13/viper v1.19.0
 	goa.design/goa/v3 v3.19.1
